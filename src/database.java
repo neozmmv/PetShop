@@ -26,8 +26,7 @@ public class database {
             System.out.println("Usuário: " + user);
             System.out.println("Banco de Dados: " + database);
 
-            // Aqui você pode fazer a conexão com o banco de dados usando esses parâmetros
-            // Exemplo de conexão usando JDBC (substitua pelo seu código de conexão)
+            // ARQUIVO server.conf DENTRO DA PASTA src
 
         } catch (IOException e) {
             System.err.println("Erro ao ler o arquivo de configuração: " + e.getMessage());
