@@ -56,6 +56,11 @@ public class Cliente {
         this.email = email;
     }
 
+    @Override
+    public String toString() {
+        return "Cliente: " + nome + "\n, Telefone: " + telefone + "\n, Email: " + email;
+    }
+
     /*
      * public static void main(String args[]) {
      * // TESTE

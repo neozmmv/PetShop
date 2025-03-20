@@ -62,4 +62,10 @@ public class Pet {
     public void setDono(Cliente dono) {
         this.dono = dono;
     }
+
+    @Override
+    public String toString() {
+        return "Pet: " + nome + ", Espécie: " + especie + ", Raça: " + raca + 
+               ", Idade: " + idade + ", Peso: " + peso + "kg";
+    }
 }

@@ -57,4 +57,11 @@ public abstract class Servico {
     public void setPet(Pet pet) {
         this.pet = pet;
     }
+
+    @Override
+    public String toString() {
+        return "Serviço: " + descricao + ", Preço: R$" + preco + 
+               ", Data: " + dataAgendamento + ", Cliente: " + cliente.getNome() + 
+               ", Pet: " + pet.getNome();
+    }
 }
