@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 //teste de leitura das informações do arquivo para conectar ao banco
-public class database {
+public class FileReader {
     public static void main(String[] args) {
         // Criação do objeto Properties
         Properties config = new Properties();
