@@ -1,6 +1,8 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /* IMPORTANTE:
 Só vai funcionar se tiver o arquivo mysql-connector.j.9.2.0.jar na pasta lib. 
@@ -54,6 +56,32 @@ public class Connect {
         }
 
     }
+
+    public ResultSet executeQuery(String query, Boolean show_result) {
+        try {
+            if (conn == null) {
+                System.err.println("Erro: Conexão não estabelecida. Chame getConnection() primeiro.");
+                return null;
+            }
+
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery(query);
+
+            if (show_result) {
+                while (resultSet.next()) {
+                    System.out.println(resultSet.getString(1)); // Exibe a primeira coluna
+                }
+            }
+
+            return stmt.executeQuery(query);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // printa o resultado da query
 
     // Função main dessa classe, só para ver o funcionamento, usar isso na funço
     // main do arquivo principal.
