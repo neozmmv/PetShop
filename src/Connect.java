@@ -57,6 +57,7 @@ public class Connect {
 
     }
 
+    //Função para BUSCAR informações no banco.
     public ResultSet executeQuery(String query, Boolean show_result) {
         try {
             if (conn == null) {
@@ -81,6 +82,78 @@ public class Connect {
         }
     }
 
+    public int getIntByQuery(String query) {
+        try {
+            if (conn == null) {
+                System.err.println("Erro: Conexão não estabelecida. Chame getConnection() primeiro.");
+                return -1;
+            }
+
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery(query);
+
+            // Verifica se há pelo menos uma linha no ResultSet
+            if (resultSet.next()) {
+                // Retorna o valor da primeira coluna da primeira linha
+                return resultSet.getInt(1);
+            } else {
+                //Retorna -1 se não tiver nenhum resultado
+                System.out.println("Nenhum resultado encontrado para a consulta.");
+                return -1;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1; //Retorna -1 se der erro.
+        }
+    }
+
+    public String getStringByQuery(String query) {
+        try {
+            if (conn == null) {
+                System.err.println("Erro: Conexão não estabelecida. Chame getConnection() primeiro.");
+                return "";
+            }
+
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery(query);
+
+            //Mesma lógica do getIntByQuery()
+            if (resultSet.next()) {
+                return resultSet.getString(1);
+            } else {
+                System.out.println("Nenhum resultado encontrado para a consulta.");
+                return "";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+
+    //Função para INSERIR ou ATUALIZAR informações do banco.
+    public int executeUpdate(String query, Boolean show_result) {
+        try {
+            if (conn == null) {
+                System.err.println("Erro: Conexão não estabelecida. Chame getConnection() primeiro.");
+                return -1;
+            }
+
+            Statement stmt = conn.createStatement();
+            int rowsAffected = stmt.executeUpdate(query);
+
+            if (show_result) {
+                System.out.println("Linhas afetadas: " + rowsAffected);
+            }
+
+            stmt.close();
+            return rowsAffected;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
     // printa o resultado da query
 
     // Função main dessa classe, só para ver o funcionamento, usar isso na funço
