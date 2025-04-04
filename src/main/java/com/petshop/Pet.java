@@ -1,3 +1,5 @@
+package com.petshop;
+
 public class Pet {
     private String nome;
     private String especie;
@@ -6,13 +8,13 @@ public class Pet {
     private double peso;
     private Cliente dono;
     
-    public Pet(String nome, String especie, String raca, int idade, double peso, Cliente dono){
+    public Pet(String nome, String raca, double peso, int idade) {
         this.nome = nome;
-        this.especie = especie;
+        this.especie = "";
         this.raca = raca;
         this.idade = idade;
         this.peso = peso;
-        this.dono = dono;
+        this.dono = null;
     }
     //crie a classe pet e as funções básicas
     public String getNome() {

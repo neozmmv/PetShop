@@ -1,0 +1,13 @@
+com\petshop\FileReader.class
+com\petshop\Cliente.class
+com\petshop\Hospedagem.class
+com\petshop\Adestramento.class
+com\petshop\QueryResult.class
+com\petshop\Consulta.class
+com\petshop\BanhoETosa.class
+module-info.class
+com\petshop\Main.class
+com\petshop\Servico.class
+com\petshop\Pet.class
+com\petshop\Connect.class
+com\petshop\PacoteServicos.class

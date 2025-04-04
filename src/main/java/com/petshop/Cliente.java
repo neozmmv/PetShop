@@ -1,3 +1,5 @@
+package com.petshop;
+
 import java.util.ArrayList;
 import java.util.List;
 //import java.sql.Connection; //Bibliotecas de acesso ao banco de dados
@@ -5,16 +7,20 @@ import java.util.List;
 
 public class Cliente {
     private String nome;
+    private String cpf;
     private String telefone;
+    private String endereco;
     private String email;
     private List<Pet> pets;
     // adicionei a lista de pets e importei as bibliotecas pra isso
 
     // Construtor do cliente
-    public Cliente(String nome, String telefone, String email) {
+    public Cliente(String nome, String cpf, String telefone, String endereco) {
         this.nome = nome;
+        this.cpf = cpf;
         this.telefone = telefone;
-        this.email = email;
+        this.endereco = endereco;
+        this.email = "";
         this.pets = new ArrayList<>();
     }
 
@@ -40,12 +46,28 @@ public class Cliente {
         this.nome = nome;
     }
 
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
     public String getTelefone() {
         return telefone;
     }
 
     public void setTelefone(String telefone) {
         this.telefone = telefone;
+    }
+
+    public String getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(String endereco) {
+        this.endereco = endereco;
     }
 
     public String getEmail() {
@@ -58,7 +80,11 @@ public class Cliente {
 
     @Override
     public String toString() {
-        return "Cliente: " + nome + "\n, Telefone: " + telefone + "\n, Email: " + email;
+        return "Cliente: " + nome + 
+               "\nCPF: " + cpf + 
+               "\nTelefone: " + telefone + 
+               "\nEndereço: " + endereco + 
+               "\nEmail: " + email;
     }
 
     /*

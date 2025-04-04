@@ -1,3 +1,5 @@
+package com.petshop;
+
 //criei a classe serviço, aí tem q criar as classes de extensão, que são os serviços mesmo
 import java.time.LocalDateTime;
 
