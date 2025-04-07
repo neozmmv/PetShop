@@ -1,6 +1,7 @@
 com\petshop\FileReader.class
 com\petshop\Cliente.class
 com\petshop\Hospedagem.class
+com\petshop\Veterinario.class
 com\petshop\Adestramento.class
 com\petshop\QueryResult.class
 com\petshop\Consulta.class

@@ -31,14 +31,18 @@ public class PacoteServicos {
         servicos.remove(servico);
     }    
 
-    public double calcularPrecoTotal(){
+    public double calcularPrecoTotal() {
         double precoTotal = 0.0;
         
-        for(Servico servico : servicos){
+        for (Servico servico : servicos) {
             precoTotal += servico.calcularPreco();
         }
 
-        precoTotal = precoTotal * (1 - (percentualDesconto/100.0));
+        // Aplica o desconto do pacote
+        if (percentualDesconto > 0) {
+            precoTotal = precoTotal * (1 - (percentualDesconto/100.0));
+        }
+        
         return precoTotal;
     }
 
@@ -81,15 +85,16 @@ public class PacoteServicos {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Pacote: ").append(nome);
-        sb.append(", Cliente: ").append(cliente.getNome());
-        sb.append(", Pet: ").append(pet.getNome());
-        sb.append(", Desconto: ").append(percentualDesconto).append("%");
-        sb.append(", Preço Total: R$").append(calcularPrecoTotal());
-        sb.append("\nServiços incluídos:");
+        sb.append("Pacote: ").append(nome).append("\n");
+        sb.append("Cliente: ").append(cliente.getNome()).append("\n");
+        sb.append("Pet: ").append(pet.getNome()).append("\n");
+        sb.append("Desconto: ").append(String.format("%.1f", percentualDesconto)).append("%\n");
+        sb.append("Preço Total: R$ ").append(String.format("%.2f", calcularPrecoTotal())).append("\n");
+        sb.append("Serviços incluídos:\n");
         
         for (Servico servico : servicos) {
-            sb.append("\n- ").append(servico.getDescricao());
+            sb.append("- ").append(servico.getDescricao())
+              .append(" (R$ ").append(String.format("%.2f", servico.calcularPreco())).append(")\n");
         }
         
         return sb.toString();

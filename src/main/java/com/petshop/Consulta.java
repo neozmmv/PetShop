@@ -14,8 +14,8 @@ public class Consulta extends Servico {
 
     @Override
     public double calcularPreco() {
-        //mais 20% no preço se for urgente
-        return consultaUrgente ? getPreco() * 1.2 : getPreco();
+        //mais 50% no preço se for urgente
+        return consultaUrgente ? getPreco() * 1.5 : getPreco();
     }
 
     public String getVeterinario() {

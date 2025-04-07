@@ -46,6 +46,38 @@ public class Hospedagem extends Servico {
         return valorTotal;
     }
 
+    public boolean isSuiteLuxo() {
+        return suiteLuxo;
+    }
+
+    public void setSuiteLuxo(boolean suiteLuxo) {
+        this.suiteLuxo = suiteLuxo;
+    }
+
+    public boolean isServicoSpa() {
+        return servicoSpa;
+    }
+
+    public void setServicoSpa(boolean servicoSpa) {
+        this.servicoSpa = servicoSpa;
+    }
+
+    public boolean isAlimentacaoEspecial() {
+        return alimentacaoEspecial;
+    }
+
+    public void setAlimentacaoEspecial(boolean alimentacaoEspecial) {
+        this.alimentacaoEspecial = alimentacaoEspecial;
+    }
+
+    public double getValorDiaria() {
+        return valorDiaria;
+    }
+
+    public void setValorDiaria(double valorDiaria) {
+        this.valorDiaria = valorDiaria;
+    }
+
     @Override
     public String toString() {
         return super.toString() +

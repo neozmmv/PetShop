@@ -1,22 +1,40 @@
 package com.petshop;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main extends Application {
     private List<Cliente> clientes = new ArrayList<>();
     private List<Pet> pets = new ArrayList<>();
     private List<Servico> servicos = new ArrayList<>();
     private List<PacoteServicos> pacotes = new ArrayList<>();
+    private List<Veterinario> veterinarios = new ArrayList<>();
+    private static Connect connection;
+
+    public Main() {
+        // Inicializa os veterinários padrão
+        veterinarios.add(new Veterinario("Luiza", "CRMV-1234", "Clínica Geral", 150.0));
+        veterinarios.add(new Veterinario("Pedro", "CRMV-5678", "Ortopedia", 150.0));
+        veterinarios.add(new Veterinario("João", "CRMV-9012", "Dermatologia", 150.0));
+    }
 
     // Método original main
     public static void main(String[] args) {
@@ -27,23 +45,20 @@ public class Main extends Application {
     // Código original do Main
     public static void executarCodigoOriginal() {
         try {
-            //ler o arquivo com as configs do banco
             FileReader fileReader = new FileReader("server.conf");
-            Connect connection = new Connect();
+            connection = new Connect();
             connection.setUser(fileReader.get_User());
             connection.setPassword(fileReader.get_Password());
             connection.mount_Url(fileReader.get_Host(), fileReader.get_Port(), fileReader.get_Database());
 
-            System.out.println(connection.getConnection());
-
-            int test = connection.getIntByQuery("SELECT id from tabela2 where nome = 'Joao';");
-            System.out.println("VALOR DE TEST:" + test);
-
-            String nome = connection.getStringByQuery("Select nome from tabela2 where id = 1");
-            System.out.println("VALOR DE NOME: " + nome);
-
-            connection.executeUpdate("(COMANDO PARA INSERIR ALGO NO BANCO)", true);
+            Connection conn = connection.getConnection();
+            if (conn != null) {
+                System.out.println("Conexão com o banco de dados estabelecida com sucesso!");
+            } else {
+                System.err.println("Não foi possível estabelecer conexão com o banco de dados.");
+            }
         } catch (Exception e) {
+            System.err.println("Erro ao conectar com o banco de dados: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -69,6 +84,7 @@ public class Main extends Application {
         Button btnPet = new Button("Gerenciar Pets");
         Button btnServico = new Button("Agendar Serviços");
         Button btnPacotes = new Button("Gerenciar Pacotes");
+        Button btnVeterinarios = new Button("Gerenciar Veterinários");
         Button btnRelatorios = new Button("Relatórios");
         Button btnSair = new Button("Sair");
 
@@ -78,16 +94,18 @@ public class Main extends Application {
         btnPet.setStyle(buttonStyle);
         btnServico.setStyle(buttonStyle);
         btnPacotes.setStyle(buttonStyle);
+        btnVeterinarios.setStyle(buttonStyle);
         btnRelatorios.setStyle(buttonStyle);
         btnSair.setStyle(buttonStyle);
 
-        mainLayout.getChildren().addAll(titulo, btnCliente, btnPet, btnServico, btnPacotes, btnRelatorios, btnSair);
+        mainLayout.getChildren().addAll(titulo, btnCliente, btnPet, btnServico, btnPacotes, btnVeterinarios, btnRelatorios, btnSair);
 
         // Ações dos botões
         btnCliente.setOnAction(e -> abrirTelaClientes());
         btnPet.setOnAction(e -> abrirTelaPets());
         btnServico.setOnAction(e -> abrirTelaServicos());
         btnPacotes.setOnAction(e -> abrirTelaPacotes());
+        btnVeterinarios.setOnAction(e -> abrirTelaVeterinarios());
         btnRelatorios.setOnAction(e -> abrirTelaRelatorios());
         btnSair.setOnAction(e -> primaryStage.close());
 
@@ -121,6 +139,20 @@ public class Main extends Application {
 
         btnSalvar.setOnAction(e -> {
             try {
+                // Validação dos campos obrigatórios
+                if (txtNome.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("O nome do cliente é obrigatório");
+                }
+                if (txtCpf.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("O CPF do cliente é obrigatório");
+                }
+                if (txtTelefone.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("O telefone do cliente é obrigatório");
+                }
+                if (txtEndereco.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("O endereço do cliente é obrigatório");
+                }
+
                 Cliente novoCliente = new Cliente(
                     txtNome.getText(),
                     txtCpf.getText(),
@@ -136,6 +168,11 @@ public class Main extends Application {
                 alert.showAndWait();
                 
                 limparCampos(txtNome, txtCpf, txtTelefone, txtEndereco, txtEmail);
+            } catch (IllegalArgumentException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro");
+                alert.setContentText(ex.getMessage());
+                alert.showAndWait();
             } catch (Exception ex) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Erro");
@@ -215,6 +252,26 @@ public class Main extends Application {
 
         btnSalvar.setOnAction(e -> {
             try {
+                // Validação dos campos obrigatórios
+                if (txtNome.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("O nome do pet é obrigatório");
+                }
+                if (txtRaca.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("A raça do pet é obrigatória");
+                }
+                if (txtPeso.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("O peso do pet é obrigatório");
+                }
+                if (txtIdade.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("A idade do pet é obrigatória");
+                }
+                if (txtEspecie.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("A espécie do pet é obrigatória");
+                }
+                if (cboDono.getValue() == null) {
+                    throw new IllegalArgumentException("É necessário selecionar o dono do pet");
+                }
+
                 Pet novoPet = new Pet(
                     txtNome.getText(),
                     txtRaca.getText(),
@@ -238,6 +295,16 @@ public class Main extends Application {
                 
                 limparCampos(txtNome, txtRaca, txtPeso, txtIdade, txtEspecie);
                 cboDono.setValue(null);
+            } catch (NumberFormatException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro");
+                alert.setContentText("Peso e idade devem ser números válidos");
+                alert.showAndWait();
+            } catch (IllegalArgumentException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro");
+                alert.setContentText(ex.getMessage());
+                alert.showAndWait();
             } catch (Exception ex) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Erro");
@@ -296,16 +363,70 @@ public class Main extends Application {
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER);
 
+        // Seleção inicial do tipo de serviço
         ComboBox<String> cboTipoServico = new ComboBox<>();
         cboTipoServico.getItems().addAll("Banho e Tosa", "Consulta Veterinária", "Hospedagem", "Adestramento");
         cboTipoServico.setPromptText("Selecione o serviço");
 
+        // Container para campos específicos do serviço
+        VBox camposServico = new VBox(10);
+        camposServico.setVisible(false);
+
+        // Campos comuns
         ComboBox<Cliente> cboCliente = new ComboBox<>();
         cboCliente.setPromptText("Selecione o Cliente");
         cboCliente.getItems().addAll(clientes);
 
         ComboBox<Pet> cboPet = new ComboBox<>();
         cboPet.setPromptText("Selecione o Pet");
+
+        DatePicker dtpData = new DatePicker();
+        dtpData.setPromptText("Data do Serviço");
+
+        // Campos específicos para Banho e Tosa
+        VBox camposBanhoTosa = new VBox(10);
+        CheckBox chkTosaProfunda = new CheckBox("Tosa Profunda (+R$ 50)");
+        CheckBox chkPerfume = new CheckBox("Perfume (+R$ 30)");
+        CheckBox chkLacoGravata = new CheckBox("Laço/Gravata (+R$ 20)");
+        camposBanhoTosa.getChildren().addAll(chkTosaProfunda, chkPerfume, chkLacoGravata);
+        camposBanhoTosa.setVisible(false);
+
+        // Campos específicos para Consulta
+        VBox camposConsulta = new VBox(10);
+        ComboBox<Veterinario> cboVeterinario = new ComboBox<>();
+        cboVeterinario.setPromptText("Selecione o Veterinário");
+        cboVeterinario.getItems().addAll(veterinarios);
+        CheckBox chkUrgente = new CheckBox("Consulta Urgente (+50%)");
+        camposConsulta.getChildren().addAll(cboVeterinario, chkUrgente);
+        camposConsulta.setVisible(false);
+
+        // Campos específicos para Hospedagem
+        VBox camposHospedagem = new VBox(10);
+        CheckBox chkSuiteLuxo = new CheckBox("Suíte Luxo (+R$ 100/dia)");
+        CheckBox chkServicoSpa = new CheckBox("Serviço Spa (+R$ 80/dia)");
+        CheckBox chkAlimentacaoEspecial = new CheckBox("Alimentação Especial (+R$ 50/dia)");
+        TextField txtDiasHospedagem = new TextField();
+        txtDiasHospedagem.setPromptText("Número de Dias");
+        camposHospedagem.getChildren().addAll(chkSuiteLuxo, chkServicoSpa, chkAlimentacaoEspecial, txtDiasHospedagem);
+        camposHospedagem.setVisible(false);
+
+        // Campos específicos para Adestramento
+        VBox camposAdestramento = new VBox(10);
+        TextField txtNumeroSessoes = new TextField();
+        txtNumeroSessoes.setPromptText("Número de Sessões");
+        TextField txtTipoTreinamento = new TextField();
+        txtTipoTreinamento.setPromptText("Tipo de Treinamento");
+        CheckBox chkAtendimentoDomiciliar = new CheckBox("Atendimento Domiciliar (+R$ 100/sessão)");
+        camposAdestramento.getChildren().addAll(txtNumeroSessoes, txtTipoTreinamento, chkAtendimentoDomiciliar);
+        camposAdestramento.setVisible(false);
+
+        // Label para mostrar o preço total
+        Label lblPrecoTotal = new Label("Preço Total: R$ 0,00");
+        lblPrecoTotal.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        Button btnCalcular = new Button("Calcular Preço");
+        Button btnAgendar = new Button("Agendar Serviço");
+        Button btnVoltar = new Button("Voltar");
 
         // Atualiza a lista de pets quando um cliente é selecionado
         cboCliente.setOnAction(e -> {
@@ -316,67 +437,71 @@ public class Main extends Application {
             }
         });
 
-        TextField txtPreco = new TextField();
-        txtPreco.setPromptText("Preço Base");
-        DatePicker dtpData = new DatePicker();
-        dtpData.setPromptText("Data do Serviço");
+        // Mostra/esconde campos específicos baseado no tipo de serviço selecionado
+        cboTipoServico.setOnAction(e -> {
+            String tipoSelecionado = cboTipoServico.getValue();
+            camposBanhoTosa.setVisible(false);
+            camposConsulta.setVisible(false);
+            camposHospedagem.setVisible(false);
+            camposAdestramento.setVisible(false);
+            camposServico.setVisible(true);
 
-        // Campos específicos para Banho e Tosa
-        CheckBox chkTosaProfunda = new CheckBox("Tosa Profunda");
-        CheckBox chkPerfume = new CheckBox("Perfume");
-        CheckBox chkLacoGravata = new CheckBox("Laço/Gravata");
+            if (tipoSelecionado != null) {
+                switch (tipoSelecionado) {
+                    case "Banho e Tosa":
+                        camposBanhoTosa.setVisible(true);
+                        break;
+                    case "Consulta Veterinária":
+                        camposConsulta.setVisible(true);
+                        break;
+                    case "Hospedagem":
+                        camposHospedagem.setVisible(true);
+                        break;
+                    case "Adestramento":
+                        camposAdestramento.setVisible(true);
+                        break;
+                }
+            }
+        });
 
-        // Campos específicos para Consulta
-        TextField txtVeterinario = new TextField();
-        txtVeterinario.setPromptText("Veterinário");
-        CheckBox chkUrgente = new CheckBox("Consulta Urgente");
-
-        // Campos específicos para Hospedagem
-        CheckBox chkSuiteLuxo = new CheckBox("Suíte Luxo");
-        CheckBox chkServicoSpa = new CheckBox("Serviço Spa");
-        CheckBox chkAlimentacaoEspecial = new CheckBox("Alimentação Especial");
-        TextField txtValorDiaria = new TextField();
-        txtValorDiaria.setPromptText("Valor da Diária");
-
-        // Campos específicos para Adestramento
-        TextField txtNumeroSessoes = new TextField();
-        txtNumeroSessoes.setPromptText("Número de Sessões");
-        TextField txtTipoTreinamento = new TextField();
-        txtTipoTreinamento.setPromptText("Tipo de Treinamento");
-        CheckBox chkAtendimentoDomiciliar = new CheckBox("Atendimento Domiciliar");
-
-        Button btnCalcular = new Button("Calcular Preço");
-        Button btnAgendar = new Button("Agendar Serviço");
-        Button btnVoltar = new Button("Voltar");
-
+        // Calcula o preço quando o botão é clicado
         btnCalcular.setOnAction(e -> {
             try {
-                Servico servico = criarServico(
-                    cboTipoServico.getValue(),
-                    cboCliente.getValue(),
-                    cboPet.getValue(),
-                    Double.parseDouble(txtPreco.getText()),
-                    dtpData.getValue().atStartOfDay(),
-                    chkTosaProfunda.isSelected(),
-                    chkPerfume.isSelected(),
-                    chkLacoGravata.isSelected(),
-                    txtVeterinario.getText(),
-                    chkUrgente.isSelected(),
-                    chkSuiteLuxo.isSelected(),
-                    chkServicoSpa.isSelected(),
-                    chkAlimentacaoEspecial.isSelected(),
-                    Double.parseDouble(txtValorDiaria.getText()),
-                    Integer.parseInt(txtNumeroSessoes.getText()),
-                    txtTipoTreinamento.getText(),
-                    chkAtendimentoDomiciliar.isSelected()
-                );
+                String tipoServico = cboTipoServico.getValue();
+                double precoTotal = 0;
 
-                if (servico != null) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Preço Calculado");
-                    alert.setContentText("Preço total do serviço: R$ " + servico.calcularPreco());
-                    alert.showAndWait();
+                switch (tipoServico) {
+                    case "Banho e Tosa":
+                        precoTotal = 100; // Preço base
+                        if (chkTosaProfunda.isSelected()) precoTotal += 50;
+                        if (chkPerfume.isSelected()) precoTotal += 30;
+                        if (chkLacoGravata.isSelected()) precoTotal += 20;
+                        break;
+
+                    case "Consulta Veterinária":
+                        Veterinario vet = cboVeterinario.getValue();
+                        if (vet != null) {
+                            precoTotal = vet.getValorConsulta();
+                            if (chkUrgente.isSelected()) precoTotal *= 1.5;
+                        }
+                        break;
+
+                    case "Hospedagem":
+                        int dias = Integer.parseInt(txtDiasHospedagem.getText());
+                        precoTotal = 100 * dias; // Preço base por dia
+                        if (chkSuiteLuxo.isSelected()) precoTotal += 100 * dias;
+                        if (chkServicoSpa.isSelected()) precoTotal += 80 * dias;
+                        if (chkAlimentacaoEspecial.isSelected()) precoTotal += 50 * dias;
+                        break;
+
+                    case "Adestramento":
+                        int sessoes = Integer.parseInt(txtNumeroSessoes.getText());
+                        precoTotal = 150 * sessoes; // Preço base por sessão
+                        if (chkAtendimentoDomiciliar.isSelected()) precoTotal += 100 * sessoes;
+                        break;
                 }
+
+                lblPrecoTotal.setText(String.format("Preço Total: R$ %.2f", precoTotal));
             } catch (Exception ex) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Erro");
@@ -387,23 +512,81 @@ public class Main extends Application {
 
         btnAgendar.setOnAction(e -> {
             try {
+                // Validação dos campos obrigatórios
+                if (cboTipoServico.getValue() == null) {
+                    throw new IllegalArgumentException("Selecione o tipo de serviço");
+                }
+                if (cboCliente.getValue() == null) {
+                    throw new IllegalArgumentException("Selecione o cliente");
+                }
+                if (cboPet.getValue() == null) {
+                    throw new IllegalArgumentException("Selecione o pet");
+                }
+                if (dtpData.getValue() == null) {
+                    throw new IllegalArgumentException("Selecione a data");
+                }
+
+                // Validações específicas por tipo de serviço
+                String tipoServico = cboTipoServico.getValue();
+                double valorDiaria = 0;
+                int numeroSessoes = 0;
+                String tipoTreinamento = "";
+
+                switch (tipoServico) {
+                    case "Consulta Veterinária":
+                        if (cboVeterinario.getValue() == null) {
+                            throw new IllegalArgumentException("Selecione o veterinário");
+                        }
+                        break;
+                    case "Hospedagem":
+                        if (txtDiasHospedagem.getText().trim().isEmpty()) {
+                            throw new IllegalArgumentException("Informe o número de dias");
+                        }
+                        try {
+                            valorDiaria = Double.parseDouble(txtDiasHospedagem.getText());
+                            if (valorDiaria <= 0) {
+                                throw new IllegalArgumentException("Número de dias deve ser maior que zero");
+                            }
+                        } catch (NumberFormatException ex) {
+                            throw new IllegalArgumentException("Número de dias inválido");
+                        }
+                        break;
+                    case "Adestramento":
+                        if (txtNumeroSessoes.getText().trim().isEmpty()) {
+                            throw new IllegalArgumentException("Informe o número de sessões");
+                        }
+                        if (txtTipoTreinamento.getText().trim().isEmpty()) {
+                            throw new IllegalArgumentException("Informe o tipo de treinamento");
+                        }
+                        try {
+                            numeroSessoes = Integer.parseInt(txtNumeroSessoes.getText());
+                            if (numeroSessoes <= 0) {
+                                throw new IllegalArgumentException("Número de sessões deve ser maior que zero");
+                            }
+                        } catch (NumberFormatException ex) {
+                            throw new IllegalArgumentException("Número de sessões inválido");
+                        }
+                        tipoTreinamento = txtTipoTreinamento.getText();
+                        break;
+                }
+
                 Servico servico = criarServico(
-                    cboTipoServico.getValue(),
+                    tipoServico,
                     cboCliente.getValue(),
                     cboPet.getValue(),
-                    Double.parseDouble(txtPreco.getText()),
+                    0, // Preço inicial zero
                     dtpData.getValue().atStartOfDay(),
                     chkTosaProfunda.isSelected(),
                     chkPerfume.isSelected(),
                     chkLacoGravata.isSelected(),
-                    txtVeterinario.getText(),
+                    cboVeterinario.getValue() != null ? cboVeterinario.getValue().getNome() : "",
                     chkUrgente.isSelected(),
                     chkSuiteLuxo.isSelected(),
                     chkServicoSpa.isSelected(),
                     chkAlimentacaoEspecial.isSelected(),
-                    Double.parseDouble(txtValorDiaria.getText()),
-                    Integer.parseInt(txtNumeroSessoes.getText()),
-                    txtTipoTreinamento.getText(),
+                    valorDiaria,
+                    numeroSessoes,
+                    tipoTreinamento,
                     chkAtendimentoDomiciliar.isSelected()
                 );
 
@@ -415,6 +598,11 @@ public class Main extends Application {
                     alert.showAndWait();
                     stage.close();
                 }
+            } catch (IllegalArgumentException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro");
+                alert.setContentText(ex.getMessage());
+                alert.showAndWait();
             } catch (Exception ex) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Erro");
@@ -425,25 +613,22 @@ public class Main extends Application {
 
         btnVoltar.setOnAction(e -> stage.close());
 
+        // Adiciona todos os campos ao layout
+        camposServico.getChildren().addAll(
+            cboCliente,
+            cboPet,
+            dtpData,
+            camposBanhoTosa,
+            camposConsulta,
+            camposHospedagem,
+            camposAdestramento,
+            lblPrecoTotal
+        );
+
         layout.getChildren().addAll(
             new Label("Agendamento de Serviço"),
             cboTipoServico,
-            cboCliente,
-            cboPet,
-            txtPreco,
-            dtpData,
-            chkTosaProfunda,
-            chkPerfume,
-            chkLacoGravata,
-            txtVeterinario,
-            chkUrgente,
-            chkSuiteLuxo,
-            chkServicoSpa,
-            chkAlimentacaoEspecial,
-            txtValorDiaria,
-            txtNumeroSessoes,
-            txtTipoTreinamento,
-            chkAtendimentoDomiciliar,
+            camposServico,
             btnCalcular,
             btnAgendar,
             btnVoltar
@@ -464,21 +649,42 @@ public class Main extends Application {
             throw new IllegalArgumentException("Cliente e Pet são obrigatórios");
         }
 
+        if (data == null) {
+            throw new IllegalArgumentException("Data é obrigatória");
+        }
+
         switch (tipo) {
             case "Banho e Tosa":
                 return new BanhoETosa("Banho e Tosa", preco, data, cliente, pet, 
                                      tosaProfunda, perfume, lacoGravata);
             case "Consulta Veterinária":
-                return new Consulta("Consulta Veterinária", preco, data, cliente, pet,
+                if (veterinario == null || veterinario.trim().isEmpty()) {
+                    throw new IllegalArgumentException("Veterinário é obrigatório para consultas");
+                }
+                // Calcula o preço da consulta considerando se é urgente
+                double precoConsulta = preco;
+                if (urgente) {
+                    precoConsulta *= 1.5; // Adiciona 50% se for urgente
+                }
+                return new Consulta("Consulta Veterinária", precoConsulta, data, cliente, pet,
                                   veterinario, urgente);
             case "Hospedagem":
+                if (valorDiaria <= 0) {
+                    throw new IllegalArgumentException("Valor da diária deve ser maior que zero");
+                }
                 return new Hospedagem("Hospedagem", preco, data, cliente, pet,
                                     suiteLuxo, servicoSpa, alimentacaoEspecial, valorDiaria);
             case "Adestramento":
+                if (numeroSessoes <= 0) {
+                    throw new IllegalArgumentException("Número de sessões deve ser maior que zero");
+                }
+                if (tipoTreinamento == null || tipoTreinamento.trim().isEmpty()) {
+                    throw new IllegalArgumentException("Tipo de treinamento é obrigatório");
+                }
                 return new Adestramento("Adestramento", preco, data, cliente, pet,
                                       numeroSessoes, tipoTreinamento, atendimentoDomiciliar);
             default:
-                return null;
+                throw new IllegalArgumentException("Tipo de serviço inválido: " + tipo);
         }
     }
 
@@ -533,28 +739,68 @@ public class Main extends Application {
 
         btnSalvar.setOnAction(e -> {
             try {
+                // Validação dos campos obrigatórios
+                if (txtNome.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("Informe o nome do pacote");
+                }
+
                 Cliente cliente = cboCliente.getValue();
                 Pet pet = cboPet.getValue();
-                double desconto = Double.parseDouble(txtDesconto.getText());
-
-                if (cliente == null || pet == null || lstServicos.getItems().isEmpty()) {
-                    throw new IllegalArgumentException("Preencha todos os campos obrigatórios");
-                }
-
-                PacoteServicos pacote = new PacoteServicos(txtNome.getText(), desconto, cliente, pet);
                 
-                for (Servico servico : lstServicos.getItems()) {
-                    pacote.adicionarServico(servico);
+                if (cliente == null) {
+                    throw new IllegalArgumentException("Selecione o cliente");
+                }
+                if (pet == null) {
+                    throw new IllegalArgumentException("Selecione o pet");
+                }
+                if (lstServicos.getItems().isEmpty()) {
+                    throw new IllegalArgumentException("Adicione pelo menos um serviço ao pacote");
                 }
 
+                // Validação do desconto
+                if (txtDesconto.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("Informe o percentual de desconto");
+                }
+                double desconto;
+                try {
+                    desconto = Double.parseDouble(txtDesconto.getText());
+                    if (desconto < 0 || desconto > 100) {
+                        throw new IllegalArgumentException("O desconto deve estar entre 0 e 100%");
+                    }
+                } catch (NumberFormatException ex) {
+                    throw new IllegalArgumentException("Percentual de desconto inválido");
+                }
+
+                // Cria o pacote
+                PacoteServicos pacote = new PacoteServicos(txtNome.getText().trim(), desconto, cliente, pet);
+                
+                // Adiciona os serviços ao pacote
+                for (Servico servico : lstServicos.getItems()) {
+                    try {
+                        pacote.adicionarServico(servico);
+                    } catch (IllegalArgumentException ex) {
+                        throw new IllegalArgumentException("Erro ao adicionar serviço ao pacote: " + ex.getMessage());
+                    }
+                }
+
+                // Calcula o preço total
+                double precoTotal = pacote.calcularPrecoTotal();
+                
+                // Adiciona o pacote à lista
                 pacotes.add(pacote);
 
+                // Mostra mensagem de sucesso
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Sucesso");
-                alert.setContentText("Pacote criado com sucesso! Preço total: R$ " + pacote.calcularPrecoTotal());
+                alert.setContentText(String.format("Pacote criado com sucesso!\nPreço total com desconto: R$ %.2f", precoTotal));
                 alert.showAndWait();
                 
                 stage.close();
+            } catch (IllegalArgumentException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro");
+                alert.setContentText(ex.getMessage());
+                alert.showAndWait();
             } catch (Exception ex) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Erro");
@@ -615,9 +861,56 @@ public class Main extends Application {
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER);
 
+        // Campos para seleção de cliente e pet
+        ComboBox<Cliente> cboCliente = new ComboBox<>();
+        cboCliente.setPromptText("Selecione o Cliente");
+        cboCliente.getItems().addAll(clientes);
+
+        ComboBox<Pet> cboPet = new ComboBox<>();
+        cboPet.setPromptText("Selecione o Pet");
+
+        // Atualiza a lista de pets quando um cliente é selecionado
+        cboCliente.setOnAction(e -> {
+            Cliente clienteSelecionado = cboCliente.getValue();
+            if (clienteSelecionado != null) {
+                cboPet.getItems().clear();
+                cboPet.getItems().addAll(clienteSelecionado.getPets());
+            }
+        });
+
         ListView<Servico> lstServicosDisponiveis = new ListView<>();
         lstServicosDisponiveis.setPrefHeight(200);
-        lstServicosDisponiveis.getItems().addAll(servicos);
+
+        // Label para mostrar o preço do serviço selecionado
+        Label lblPrecoServico = new Label("Preço do Serviço: R$ 0,00");
+        lblPrecoServico.setStyle("-fx-font-weight: bold");
+
+        // Atualiza a lista de serviços quando cliente e pet são selecionados
+        cboPet.setOnAction(e -> {
+            Cliente clienteSelecionado = cboCliente.getValue();
+            Pet petSelecionado = cboPet.getValue();
+            
+            if (clienteSelecionado != null && petSelecionado != null) {
+                lstServicosDisponiveis.getItems().clear();
+                // Filtra os serviços pelo cliente e pet selecionados
+                for (Servico servico : servicos) {
+                    if (servico.getCliente().equals(clienteSelecionado) && 
+                        servico.getPet().equals(petSelecionado)) {
+                        lstServicosDisponiveis.getItems().add(servico);
+                    }
+                }
+            }
+        });
+
+        // Atualiza o preço quando um serviço é selecionado
+        lstServicosDisponiveis.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                double preco = newVal.calcularPreco();
+                lblPrecoServico.setText(String.format("Preço do Serviço: R$ %.2f", preco));
+            } else {
+                lblPrecoServico.setText("Preço do Serviço: R$ 0,00");
+            }
+        });
 
         Button btnAdicionar = new Button("Adicionar ao Pacote");
         Button btnCancelar = new Button("Cancelar");
@@ -625,23 +918,71 @@ public class Main extends Application {
         btnAdicionar.setOnAction(e -> {
             Servico servicoSelecionado = lstServicosDisponiveis.getSelectionModel().getSelectedItem();
             if (servicoSelecionado != null) {
-                lstServicos.getItems().add(servicoSelecionado);
-                stage.close();
+                // Verifica se o serviço já está no pacote
+                if (!lstServicos.getItems().contains(servicoSelecionado)) {
+                    // Calcula o preço do serviço antes de adicioná-lo ao pacote
+                    double precoCalculado = servicoSelecionado.calcularPreco();
+                    
+                    // Cria uma cópia do serviço com o preço calculado
+                    Servico servicoComPreco = criarServico(
+                        servicoSelecionado.getDescricao(),
+                        servicoSelecionado.getCliente(),
+                        servicoSelecionado.getPet(),
+                        servicoSelecionado instanceof Consulta ? 
+                            getValorConsultaVeterinario(((Consulta) servicoSelecionado).getVeterinario()) : 
+                            precoCalculado,
+                        servicoSelecionado.getDataAgendamento(),
+                        servicoSelecionado instanceof BanhoETosa ? ((BanhoETosa) servicoSelecionado).isTosaProfunda() : false,
+                        servicoSelecionado instanceof BanhoETosa ? ((BanhoETosa) servicoSelecionado).isPerfume() : false,
+                        servicoSelecionado instanceof BanhoETosa ? ((BanhoETosa) servicoSelecionado).isLacoOuGravata() : false,
+                        servicoSelecionado instanceof Consulta ? ((Consulta) servicoSelecionado).getVeterinario() : "",
+                        servicoSelecionado instanceof Consulta ? ((Consulta) servicoSelecionado).isConsultaUrgente() : false,
+                        servicoSelecionado instanceof Hospedagem ? ((Hospedagem) servicoSelecionado).isSuiteLuxo() : false,
+                        servicoSelecionado instanceof Hospedagem ? ((Hospedagem) servicoSelecionado).isServicoSpa() : false,
+                        servicoSelecionado instanceof Hospedagem ? ((Hospedagem) servicoSelecionado).isAlimentacaoEspecial() : false,
+                        servicoSelecionado instanceof Hospedagem ? ((Hospedagem) servicoSelecionado).getValorDiaria() : 0,
+                        servicoSelecionado instanceof Adestramento ? ((Adestramento) servicoSelecionado).getNumeroSessoes() : 0,
+                        servicoSelecionado instanceof Adestramento ? ((Adestramento) servicoSelecionado).getTipoTreinamento() : "",
+                        servicoSelecionado instanceof Adestramento ? ((Adestramento) servicoSelecionado).isAtendimentoDomiciliar() : false
+                    );
+                    
+                    lstServicos.getItems().add(servicoComPreco);
+                    stage.close();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Aviso");
+                    alert.setContentText("Este serviço já está no pacote!");
+                    alert.showAndWait();
+                }
             }
         });
 
         btnCancelar.setOnAction(e -> stage.close());
 
         layout.getChildren().addAll(
-            new Label("Selecione um Serviço:"),
+            new Label("Selecione o Cliente e Pet:"),
+            cboCliente,
+            cboPet,
+            new Label("Serviços Disponíveis:"),
             lstServicosDisponiveis,
+            lblPrecoServico,
             btnAdicionar,
             btnCancelar
         );
 
-        Scene scene = new Scene(layout, 400, 300);
+        Scene scene = new Scene(layout, 400, 500);
         stage.setScene(scene);
         stage.show();
+    }
+
+    // Método auxiliar para obter o valor da consulta do veterinário
+    private double getValorConsultaVeterinario(String nomeVeterinario) {
+        for (Veterinario vet : veterinarios) {
+            if (vet.getNome().equals(nomeVeterinario)) {
+                return vet.getValorConsulta();
+            }
+        }
+        return 0.0; // Retorna 0 se não encontrar o veterinário (não deveria acontecer)
     }
 
     private void abrirTelaRelatorios() {
@@ -656,6 +997,7 @@ public class Main extends Application {
         Button btnRelatorioPets = new Button("Relatório de Pets");
         Button btnRelatorioServicos = new Button("Relatório de Serviços");
         Button btnRelatorioPacotes = new Button("Relatório de Pacotes");
+        Button btnRelatorioVeterinarios = new Button("Relatório de Veterinários");
         Button btnVoltar = new Button("Voltar");
 
         btnRelatorioClientes.setOnAction(e -> {
@@ -729,6 +1071,32 @@ public class Main extends Application {
             mostrarRelatorio("Relatório de Pacotes", sb.toString());
         });
 
+        btnRelatorioVeterinarios.setOnAction(e -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append("RELATÓRIO DE VETERINÁRIOS\n");
+            sb.append("========================\n\n");
+            
+            for (Veterinario vet : veterinarios) {
+                sb.append("Nome: ").append(vet.getNome()).append("\n");
+                sb.append("CRMV: ").append(vet.getCrmv()).append("\n");
+                sb.append("Especialidade: ").append(vet.getEspecialidade()).append("\n");
+                sb.append("Valor da Consulta: R$ ").append(vet.getValorConsulta()).append("\n");
+                
+                // Conta quantas consultas cada veterinário realizou
+                int consultas = 0;
+                for (Servico servico : servicos) {
+                    if (servico instanceof Consulta && 
+                        ((Consulta) servico).getVeterinario().equals(vet.getNome())) {
+                        consultas++;
+                    }
+                }
+                sb.append("Consultas Realizadas: ").append(consultas).append("\n");
+                sb.append("-------------------\n\n");
+            }
+            
+            mostrarRelatorio("Relatório de Veterinários", sb.toString());
+        });
+
         btnVoltar.setOnAction(e -> stage.close());
 
         layout.getChildren().addAll(
@@ -737,6 +1105,7 @@ public class Main extends Application {
             btnRelatorioPets,
             btnRelatorioServicos,
             btnRelatorioPacotes,
+            btnRelatorioVeterinarios,
             btnVoltar
         );
 
@@ -772,4 +1141,120 @@ public class Main extends Application {
             campo.clear();
         }
     }
+
+    private void abrirTelaVeterinarios() {
+        Stage stage = new Stage();
+        stage.setTitle("Gerenciamento de Veterinários");
+
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(20));
+        layout.setAlignment(Pos.CENTER);
+
+        TextField txtNome = new TextField();
+        txtNome.setPromptText("Nome do Veterinário");
+        TextField txtCrmv = new TextField();
+        txtCrmv.setPromptText("CRMV");
+        TextField txtEspecialidade = new TextField();
+        txtEspecialidade.setPromptText("Especialidade");
+        TextField txtValorConsulta = new TextField();
+        txtValorConsulta.setPromptText("Valor da Consulta");
+
+        Button btnSalvar = new Button("Salvar Veterinário");
+        Button btnListar = new Button("Listar Veterinários");
+        Button btnVoltar = new Button("Voltar");
+
+        btnSalvar.setOnAction(e -> {
+            try {
+                // Validação dos campos obrigatórios
+                if (txtNome.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("O nome do veterinário é obrigatório");
+                }
+                if (txtCrmv.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("O CRMV é obrigatório");
+                }
+                if (txtEspecialidade.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("A especialidade é obrigatória");
+                }
+                if (txtValorConsulta.getText().trim().isEmpty()) {
+                    throw new IllegalArgumentException("O valor da consulta é obrigatório");
+                }
+
+                // Validação do valor da consulta
+                double valorConsulta;
+                try {
+                    valorConsulta = Double.parseDouble(txtValorConsulta.getText());
+                    if (valorConsulta <= 0) {
+                        throw new IllegalArgumentException("O valor da consulta deve ser maior que zero");
+                    }
+                } catch (NumberFormatException ex) {
+                    throw new IllegalArgumentException("O valor da consulta deve ser um número válido");
+                }
+
+                Veterinario novoVet = new Veterinario(
+                    txtNome.getText(),
+                    txtCrmv.getText(),
+                    txtEspecialidade.getText(),
+                    valorConsulta
+                );
+                veterinarios.add(novoVet);
+                
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Sucesso");
+                alert.setContentText("Veterinário cadastrado com sucesso!");
+                alert.showAndWait();
+                
+                limparCampos(txtNome, txtCrmv, txtEspecialidade, txtValorConsulta);
+            } catch (IllegalArgumentException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro");
+                alert.setContentText(ex.getMessage());
+                alert.showAndWait();
+            } catch (Exception ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro");
+                alert.setContentText("Erro ao cadastrar veterinário: " + ex.getMessage());
+                alert.showAndWait();
+            }
+        });
+
+        btnListar.setOnAction(e -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Lista de Veterinários:\n\n");
+            for (Veterinario vet : veterinarios) {
+                sb.append(vet.toString()).append("\n\n");
+            }
+            
+            TextArea textArea = new TextArea(sb.toString());
+            textArea.setEditable(false);
+            textArea.setPrefRowCount(10);
+            
+            Stage listStage = new Stage();
+            listStage.setTitle("Lista de Veterinários");
+            VBox listLayout = new VBox(10);
+            listLayout.setPadding(new Insets(20));
+            listLayout.getChildren().add(textArea);
+            
+            Scene listScene = new Scene(listLayout, 400, 300);
+            listStage.setScene(listScene);
+            listStage.show();
+        });
+
+        btnVoltar.setOnAction(e -> stage.close());
+
+        layout.getChildren().addAll(
+            new Label("Cadastro de Veterinário"),
+            txtNome,
+            txtCrmv,
+            txtEspecialidade,
+            txtValorConsulta,
+            btnSalvar,
+            btnListar,
+            btnVoltar
+        );
+
+        Scene scene = new Scene(layout, 400, 500);
+        stage.setScene(scene);
+        stage.show();
+    }
 }
+
