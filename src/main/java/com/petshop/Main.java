@@ -20,6 +20,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.collections.FXCollections;
 
 public class Main extends Application {
     private List<Cliente> clientes = new ArrayList<>();
@@ -161,6 +162,8 @@ public class Main extends Application {
                 );
                 novoCliente.setEmail(txtEmail.getText());
                 clientes.add(novoCliente);
+
+                connection.inserirCliente(novoCliente); //adiciona no banco de dados.
                 
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Sucesso");
@@ -184,7 +187,10 @@ public class Main extends Application {
         btnListar.setOnAction(e -> {
             StringBuilder sb = new StringBuilder();
             sb.append("Lista de Clientes:\n\n");
-            for (Cliente cliente : clientes) {
+
+            List<Cliente> listaClientes = connection.getTodosClientes();
+
+            for (Cliente cliente : listaClientes) {
                 sb.append(cliente.toString()).append("\n\n");
             }
             
@@ -241,6 +247,7 @@ public class Main extends Application {
         TextField txtEspecie = new TextField();
         txtEspecie.setPromptText("Espécie");
         ComboBox<Cliente> cboDono = new ComboBox<>();
+        List<Cliente> listaClientes = connection.getTodosClientes();
         cboDono.setPromptText("Selecione o Dono");
 
         Button btnSalvar = new Button("Salvar Pet");
@@ -248,7 +255,8 @@ public class Main extends Application {
         Button btnVoltar = new Button("Voltar");
 
         // Atualiza a lista de clientes no ComboBox
-        cboDono.getItems().addAll(clientes);
+        //cboDono.getItems().addAll(clientes);
+        cboDono.setItems(FXCollections.observableArrayList(listaClientes));
 
         btnSalvar.setOnAction(e -> {
             try {
@@ -287,6 +295,8 @@ public class Main extends Application {
                 }
                 
                 pets.add(novoPet);
+
+                connection.inserirPet(novoPet);
                 
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Sucesso");
@@ -313,10 +323,17 @@ public class Main extends Application {
             }
         });
 
+
+        //LISTAR OS PETS ESTÁ COM PROBLEMA!!!!!!!
+
+
         btnListar.setOnAction(e -> {
             StringBuilder sb = new StringBuilder();
             sb.append("Lista de Pets:\n\n");
-            for (Pet pet : pets) {
+
+            List<Pet> petsList = connection.getTodosPets();
+
+            for (Pet pet : petsList) {
                 sb.append(pet.toString()).append("\n\n");
             }
             

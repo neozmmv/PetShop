@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
+import java.util.ArrayList;
 
 /* IMPORTANTE:
 Só vai funcionar se tiver o arquivo mysql-connector.j.9.2.0.jar na pasta lib. 
@@ -58,6 +60,128 @@ public class Connect {
         }
 
     }
+
+    //inserir o cliente criado no banco.
+    public boolean inserirCliente(Cliente cliente) {
+        String sql = "INSERT INTO clientes (nome, cpf, telefone, endereco, email) VALUES (?, ?, ?, ?, ?)";
+
+        try {
+            Connection conn = getConnection();
+            if (conn == null) {
+                System.err.println("Erro: conexão não estabelecida.");
+                return false;
+            }
+
+            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, cliente.getNome());
+            pstmt.setString(2, cliente.getCpf());
+            pstmt.setString(3, cliente.getTelefone());
+            pstmt.setString(4, cliente.getEndereco());
+            pstmt.setString(5, cliente.getEmail());
+
+            int rows = pstmt.executeUpdate();
+            pstmt.close();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    //puxar todos os clientes do banco e retornar um array com eles.
+    public List<Cliente> getTodosClientes() {
+        List<Cliente> lista = new ArrayList<>();
+
+        try {
+            if (conn == null) {
+                System.err.println("Erro: Conexão não estabelecida. Chame getConnection() primeiro.");
+                return lista;
+            }
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT nome, cpf, telefone, endereco, email FROM clientes");
+
+            while (rs.next()) {
+                Cliente cliente = new Cliente(
+                        rs.getString("nome"),
+                        rs.getString("cpf"),
+                        rs.getString("telefone"),
+                        rs.getString("endereco")
+                );
+                cliente.setEmail(rs.getString("email"));
+                lista.add(cliente);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
+
+    //inserção do pet na tabela pets do banco.
+    public boolean inserirPet(Pet pet) {
+        String sql = "INSERT INTO pets (nome, nome_dono, especie, raca, idade, peso) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = getConnection();
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            if (conn == null) {
+                System.err.println("Erro: conexão não estabelecida.");
+                return false;
+            }
+
+            // Definir os parâmetros da consulta
+            pstmt.setString(1, pet.getNome());
+            pstmt.setString(2, pet.getDono().getNome());
+            pstmt.setString(3, pet.getEspecie());
+            pstmt.setString(4, pet.getRaca());
+            pstmt.setInt(5, pet.getIdade());
+            pstmt.setDouble(6, pet.getPeso());
+
+            // Executar a inserção no banco
+            int rows = pstmt.executeUpdate();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    //FUNCAO PARA LISTAR OS PETS (ESTÁ COM PROBLEMA)!!!!!!!!!!
+    public List<Pet> getTodosPets() {
+        List<Pet> lista = new ArrayList<>();
+
+        try {
+            if (conn == null) {
+                System.err.println("Erro: Conexão não estabelecida. Chame getConnection() primeiro.");
+                return lista;
+            }
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT nome, nome_dono, especie, raca, idade, peso from pets;");
+
+            while (rs.next()) {
+                Pet pet = new Pet(
+                        rs.getString("nome"),
+                        rs.getString("raca"),
+                        rs.getDouble("peso"),
+                        rs.getInt("idade")
+                );
+                lista.add(pet);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
+
 
     //Função para BUSCAR informações no banco.
     public ResultSet executeQuery(String query, Boolean show_result) {

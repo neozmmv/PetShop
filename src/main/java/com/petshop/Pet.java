@@ -68,6 +68,6 @@ public class Pet {
     @Override
     public String toString() {
         return "Pet: " + nome + ", Espécie: " + especie + ", Raça: " + raca + 
-               ", Idade: " + idade + ", Peso: " + peso + "kg";
+               ", Idade: " + idade + ", Peso: " + peso + "kg" + ", Dono: " + dono.getNome();
     }
 }
