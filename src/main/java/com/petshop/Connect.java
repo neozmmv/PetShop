@@ -152,7 +152,7 @@ public class Connect {
         }
     }
 
-    //FUNCAO PARA LISTAR OS PETS (ESTÁ COM PROBLEMA)!!!!!!!!!!
+    //Função para retornar uma lista com todos os pets
     public List<Pet> getTodosPets() {
         List<Pet> lista = new ArrayList<>();
 
@@ -172,6 +172,8 @@ public class Connect {
                         rs.getDouble("peso"),
                         rs.getInt("idade")
                 );
+                Cliente dono = new Cliente(rs.getString("nome_dono"));
+                pet.setDono(dono);
                 lista.add(pet);
             }
 

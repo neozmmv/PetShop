@@ -71,6 +71,9 @@ public class Main extends Application {
         new Thread(() -> executarCodigoOriginal()).start();
 
         primaryStage.setTitle("Sistema PetShop");
+        //abrir janela em 800x600\
+        primaryStage.setWidth(800);
+        primaryStage.setHeight(600);
 
         // Menu Principal
         VBox mainLayout = new VBox(15);
@@ -322,9 +325,6 @@ public class Main extends Application {
                 alert.showAndWait();
             }
         });
-
-
-        //LISTAR OS PETS ESTÁ COM PROBLEMA!!!!!!!
 
 
         btnListar.setOnAction(e -> {

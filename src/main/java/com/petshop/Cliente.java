@@ -28,6 +28,18 @@ public class Cliente {
         this.pets = new ArrayList<>();
     }
 
+    //construtor só com o nome
+    //necessário para conseguir buscar o dono do pet pelo nome
+    public Cliente(String nome) {
+        this.nome = nome;
+        this.cpf = "";
+        this.telefone = "";
+        this.endereco = "";
+        this.email = "";
+        this.pets = new ArrayList<>();
+    }
+
+
     // Funções de pegar informação (cliente.nome(), cliente.email(), etc...)
     // adicionei as funções relacionadas à classe pet e ao cliente
     public void adicionarPet(Pet pet) {
