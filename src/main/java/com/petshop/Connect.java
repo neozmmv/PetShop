@@ -1,10 +1,13 @@
 package com.petshop;
 
+import javafx.scene.control.DatePicker;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -90,6 +93,37 @@ public class Connect {
         }
     }
 
+    public boolean inserirBanhoTosa(Cliente cliente, Pet pet, DatePicker datapicker, boolean tosa_profunda, boolean perfume, boolean gravata, double valor) {
+        String sql = "INSERT INTO banho_tosa (nome_cliente, nome_pet, data_servico, tosa_profunda, perfume, gravata, valor_servico) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        java.sql.Date data = java.sql.Date.valueOf(datapicker.getValue()); //converte do datapicker para um valor armazenavel no banco
+
+        try {
+            Connection conn = getConnection();
+            if (conn == null) {
+                System.err.println("Erro: conexão não estabelecida.");
+                return false;
+            }
+
+            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, cliente.getNome());
+            pstmt.setString(2, pet.getNome());
+            pstmt.setDate(3, data);
+            pstmt.setBoolean(4, tosa_profunda);
+            pstmt.setBoolean(5, perfume);
+            pstmt.setBoolean(6, gravata);
+            pstmt.setDouble(7, valor);
+
+            int rows = pstmt.executeUpdate();
+            pstmt.close();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     //puxar todos os clientes do banco e retornar um array com eles.
     public List<Cliente> getTodosClientes() {
         List<Cliente> lista = new ArrayList<>();
@@ -152,6 +186,63 @@ public class Connect {
         }
     }
 
+    public List<Pet> getPetsByClientName(String nome_cliente) {
+        List<Pet> lista = new ArrayList<>();
+        java.sql.PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            Connection conn = getConnection();
+
+            if (conn == null) {
+                System.err.println("Erro: Conexão não estabelecida. Chame getConnection() primeiro.");
+                return lista;
+            }
+
+            String sql = "SELECT nome, nome_dono, especie, raca, idade, peso FROM pets WHERE nome_dono = ?";
+            pstmt = conn.prepareStatement(sql);
+
+            // Passando o nome do dono como parâmetro do ?
+            pstmt.setString(1, nome_cliente);
+
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Pet pet = new Pet(
+                        rs.getString("nome"),
+                        rs.getString("especie"),
+                        rs.getString("raca"),
+                        rs.getDouble("peso"),
+                        rs.getInt("idade")
+                );
+
+                Cliente dono = new Cliente(rs.getString("nome_dono"));
+                pet.setDono(dono);  // Associando o dono ao pet
+
+                // Adicionando o pet à lista
+                lista.add(pet);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Fechando os recursos para evitar vazamento
+            /*try {
+                if (rs != null) rs.close();
+                if (pstmt != null) pstmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }*/
+        }
+
+        return lista;
+    }
+
+
+
+
+
     //Função para retornar uma lista com todos os pets
     public List<Pet> getTodosPets() {
         List<Pet> lista = new ArrayList<>();
@@ -168,6 +259,7 @@ public class Connect {
             while (rs.next()) {
                 Pet pet = new Pet(
                         rs.getString("nome"),
+                        rs.getString("especie"),
                         rs.getString("raca"),
                         rs.getDouble("peso"),
                         rs.getInt("idade")

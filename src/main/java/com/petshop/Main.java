@@ -29,6 +29,7 @@ public class Main extends Application {
     private List<PacoteServicos> pacotes = new ArrayList<>();
     private List<Veterinario> veterinarios = new ArrayList<>();
     private static Connect connection;
+    double precoTotal = 0;
 
     public Main() {
         // Inicializa os veterinários padrão
@@ -54,7 +55,7 @@ public class Main extends Application {
 
             Connection conn = connection.getConnection();
             if (conn != null) {
-                System.out.println("Conexão com o banco de dados estabelecida com sucesso!");
+                System.out.println("Banco de dados conectado com sucesso!");
             } else {
                 System.err.println("Não foi possível estabelecer conexão com o banco de dados.");
             }
@@ -392,10 +393,16 @@ public class Main extends Application {
         // Campos comuns
         ComboBox<Cliente> cboCliente = new ComboBox<>();
         cboCliente.setPromptText("Selecione o Cliente");
-        cboCliente.getItems().addAll(clientes);
+        //puxar os clientes do banco
+        List<Cliente> listaClientes = connection.getTodosClientes();
+        cboCliente.setItems(FXCollections.observableArrayList(listaClientes));
+        //cboCliente.getItems().addAll(clientes);
 
         ComboBox<Pet> cboPet = new ComboBox<>();
         cboPet.setPromptText("Selecione o Pet");
+
+        List<Pet> listaPets = connection.getTodosPets();
+        //cboPet.setItems(FXCollections.observableArrayList(listaPets));
 
         DatePicker dtpData = new DatePicker();
         dtpData.setPromptText("Data do Serviço");
@@ -449,8 +456,10 @@ public class Main extends Application {
         cboCliente.setOnAction(e -> {
             Cliente clienteSelecionado = cboCliente.getValue();
             if (clienteSelecionado != null) {
+                System.out.println(clienteSelecionado); //debug
+                System.out.println(connection.getPetsByClientName(clienteSelecionado.getNome())); //debug
                 cboPet.getItems().clear();
-                cboPet.getItems().addAll(clienteSelecionado.getPets());
+                cboPet.getItems().addAll(connection.getPetsByClientName(clienteSelecionado.getNome()));
             }
         });
 
@@ -485,7 +494,7 @@ public class Main extends Application {
         btnCalcular.setOnAction(e -> {
             try {
                 String tipoServico = cboTipoServico.getValue();
-                double precoTotal = 0;
+
 
                 switch (tipoServico) {
                     case "Banho e Tosa":
@@ -527,6 +536,8 @@ public class Main extends Application {
             }
         });
 
+
+        //fazer a partir do banho e tosa
         btnAgendar.setOnAction(e -> {
             try {
                 // Validação dos campos obrigatórios
@@ -607,9 +618,15 @@ public class Main extends Application {
                     chkAtendimentoDomiciliar.isSelected()
                 );
 
+                //parte de salvar o agendamento
                 if (servico != null) {
                     servicos.add(servico);
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    //fazer a checagem do tipo de servico para salvar nas tabelas certas!!
+                    if(cboTipoServico.getValue().equals("Banho e Tosa"))
+                    {
+                        connection.inserirBanhoTosa(cboCliente.getValue(), cboPet.getValue(), dtpData, chkTosaProfunda.isSelected(), chkPerfume.isSelected(), chkLacoGravata.isSelected(), precoTotal);
+                    }
                     alert.setTitle("Sucesso");
                     alert.setContentText("Serviço agendado com sucesso!");
                     alert.showAndWait();
