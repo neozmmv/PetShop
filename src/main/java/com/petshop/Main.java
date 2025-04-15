@@ -478,26 +478,73 @@ public class Main extends Application {
 
 
         btnListar.setOnAction(e -> {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Lista de Pets:\n\n");
-
-            List<Pet> petsList = connection.getTodosPets();
-
-            for (Pet pet : petsList) {
-                sb.append(pet.toString()).append("\n\n");
-            }
-            
-            TextArea textArea = new TextArea(sb.toString());
-            textArea.setEditable(false);
-            textArea.setPrefRowCount(10);
-            
             Stage listStage = new Stage();
             listStage.setTitle("Lista de Pets");
+            
             VBox listLayout = new VBox(10);
             listLayout.setPadding(new Insets(20));
-            listLayout.getChildren().add(textArea);
+            listLayout.setAlignment(Pos.CENTER);
             
-            Scene listScene = new Scene(listLayout, 400, 300);
+            // Obter a lista de pets do banco de dados
+            List<Pet> listaPets = connection.getTodosPets();
+            
+            // Criar uma tabela para exibir os pets
+            TableView<Pet> tabelaPets = new TableView<>();
+            tabelaPets.setPrefHeight(400);
+            tabelaPets.setPrefWidth(600);
+            
+            // Definir as colunas da tabela
+            TableColumn<Pet, String> colNome = new TableColumn<>("Nome");
+            colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+            colNome.setPrefWidth(100);
+            
+            TableColumn<Pet, String> colEspecie = new TableColumn<>("Espécie");
+            colEspecie.setCellValueFactory(new PropertyValueFactory<>("especie"));
+            colEspecie.setPrefWidth(100);
+            
+            TableColumn<Pet, String> colRaca = new TableColumn<>("Raça");
+            colRaca.setCellValueFactory(new PropertyValueFactory<>("raca"));
+            colRaca.setPrefWidth(100);
+            
+            TableColumn<Pet, Number> colPeso = new TableColumn<>("Peso");
+            colPeso.setCellValueFactory(new PropertyValueFactory<>("peso"));
+            colPeso.setPrefWidth(80);
+            
+            TableColumn<Pet, Number> colIdade = new TableColumn<>("Idade");
+            colIdade.setCellValueFactory(new PropertyValueFactory<>("idade"));
+            colIdade.setPrefWidth(80);
+            
+            TableColumn<Pet, String> colDono = new TableColumn<>("Dono");
+            colDono.setCellValueFactory(cellData -> {
+                Cliente dono = cellData.getValue().getDono();
+                return dono != null ? new javafx.beans.property.SimpleStringProperty(dono.getNome()) : new javafx.beans.property.SimpleStringProperty("");
+            });
+            colDono.setPrefWidth(140);
+            
+            // Adicionar as colunas à tabela
+            tabelaPets.getColumns().addAll(colNome, colEspecie, colRaca, colPeso, colIdade, colDono);
+            
+            // Adicionar os pets à tabela
+            tabelaPets.setItems(FXCollections.observableArrayList(listaPets));
+            
+            Button btnAtualizar = new Button("Atualizar Lista");
+            Button btnVoltar2 = new Button("Voltar");
+            
+            btnAtualizar.setOnAction(event -> {
+                List<Pet> petsAtualizados = connection.getTodosPets();
+                tabelaPets.setItems(FXCollections.observableArrayList(petsAtualizados));
+            });
+            
+            btnVoltar2.setOnAction(event -> listStage.close());
+            
+            listLayout.getChildren().addAll(
+                new Label("Lista de Pets"),
+                tabelaPets,
+                btnAtualizar,
+                btnVoltar2
+            );
+            
+            Scene listScene = new Scene(listLayout, 650, 500);
             listStage.setScene(listScene);
             listStage.show();
         });
