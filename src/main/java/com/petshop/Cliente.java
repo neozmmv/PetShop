@@ -46,39 +46,7 @@ public class Cliente {
         pets.add(pet);
     }
 
-    public int getId() {
-        String sql = "SELECT id FROM clientes WHERE NOME = ? and TELEFONE = ?";
-
-        try {
-            Connect connection = new Connect();
-            Connection conn = connection.getConnection();
-            if (conn == null) {
-                System.err.println("Erro: conexão não estabelecida.");
-                return -1;
-            }
-
-            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, nome);
-            pstmt.setString(2, telefone);
-
-            ResultSet rs = pstmt.executeQuery();  // <- Aqui é a correção principal
-            int id = -1;
-
-            if (rs.next()) {
-                id = rs.getInt("id");
-            }
-
-            rs.close();
-            pstmt.close();
-            conn.close();
-
-            return id;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return -1;
-        }
-    }
+    // !! getID() está na classe Connect
 
     public void removerPet(Pet pet) {
         pets.remove(pet);

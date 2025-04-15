@@ -19,6 +19,7 @@ Rodar usando:
 java -cp "libs/*;bin" Connect 
 */
 
+//TODAS AS FUNCOES DO BANCO DE DADOS DEVEM ESTAR AQUI!
 public class Connect {
 
     private String url;
@@ -27,7 +28,7 @@ public class Connect {
 
     // PORTA PADRÃO MYSQL = 3306
 
-    private static Connection conn;
+    private Connection conn;
 
     // Funções Setters
 
@@ -124,6 +125,36 @@ public class Connect {
         }
     }
 
+    public int getId(Cliente cliente) {
+        String sql = "SELECT id FROM clientes WHERE NOME = ? and TELEFONE = ?";
+
+        try {
+            if (conn == null) {
+                System.err.println("Erro: conexão não estabelecida.");
+                return -1;
+            }
+
+            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, cliente.getNome());
+            pstmt.setString(2, cliente.getTelefone());
+
+            ResultSet rs = pstmt.executeQuery();
+            int id = -1;
+
+            if (rs.next()) {
+                id = rs.getInt("id");
+            }
+
+            rs.close();
+            pstmt.close();
+            return id;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
     //puxar todos os clientes do banco e retornar um array com eles.
     public List<Cliente> getTodosClientes() {
         List<Cliente> lista = new ArrayList<>();
@@ -155,17 +186,42 @@ public class Connect {
         return lista;
     }
 
-    //inserção do pet na tabela pets do banco.
-    public boolean inserirPet(Pet pet) {
-        String sql = "INSERT INTO pets (nome, nome_dono, especie, raca, idade, peso) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = getConnection();
-             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    public boolean deleteClientePorId(int id) {
+        String sql = "DELETE FROM clientes WHERE id = ?";
 
+        try {
+            Connection conn = getConnection();
             if (conn == null) {
                 System.err.println("Erro: conexão não estabelecida.");
                 return false;
             }
+
+            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
+
+            int rows = pstmt.executeUpdate();
+            pstmt.close();
+
+            return rows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    //inserção do pet na tabela pets do banco.
+    public boolean inserirPet(Pet pet) {
+        String sql = "INSERT INTO pets (nome, nome_dono, especie, raca, idade, peso) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try {
+
+            Connection conn = getConnection();
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
+            /* if (conn == null) {
+                System.err.println("Erro: conexão não estabelecida.");
+                return false;
+            } */
 
             // Definir os parâmetros da consulta
             pstmt.setString(1, pet.getNome());
@@ -177,6 +233,7 @@ public class Connect {
 
             // Executar a inserção no banco
             int rows = pstmt.executeUpdate();
+            pstmt.close();
 
             return rows > 0;
 
@@ -381,10 +438,12 @@ public class Connect {
     public static void main(String args[]) {
         // Criando o objeto e configurando
         // informações não funcionais, só para visualização
-        Connect connect = new Connect();
-        connect.setUser("usuario_do_banco");
-        connect.setPassword("SENHA DO USUARIO");
-        connect.mount_Url("IP DO SERVIDOR", 3306, "db_NOME");
-        System.out.println(connect.getConnection());
+            FileReader fileReader = new FileReader("server.conf");
+            Connect connection = new Connect();
+            connection.setUser(fileReader.get_User());
+            connection.setPassword(fileReader.get_Password());
+            connection.mount_Url(fileReader.get_Host(), fileReader.get_Port(), fileReader.get_Database());
+        System.out.println(connection.getConnection());
+        connection.deleteClientePorId(3);
     }
 }

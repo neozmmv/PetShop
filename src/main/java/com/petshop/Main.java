@@ -4,23 +4,18 @@ import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.collections.FXCollections;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 public class Main extends Application {
     private List<Cliente> clientes = new ArrayList<>();
@@ -123,6 +118,107 @@ public class Main extends Application {
         Stage stage = new Stage();
         stage.setTitle("Gerenciamento de Clientes");
 
+        VBox mainLayout = new VBox(15);
+        mainLayout.setPadding(new Insets(20));
+        mainLayout.setAlignment(Pos.CENTER);
+
+        Label titulo = new Label("Gerenciamento de Clientes");
+        titulo.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        Button btnCadastrar = new Button("Cadastrar Cliente");
+        Button btnDeletar = new Button("Deletar Cliente");
+        Button btnListar = new Button("Listar Clientes"); // Nova opção
+        Button btnVoltar = new Button("Voltar");
+
+        // Estilização dos botões
+        String buttonStyle = "-fx-font-size: 14px; -fx-min-width: 200px; -fx-min-height: 40px;";
+        btnCadastrar.setStyle(buttonStyle);
+        btnDeletar.setStyle(buttonStyle);
+        btnListar.setStyle(buttonStyle); // Estilização do novo botão
+        btnVoltar.setStyle(buttonStyle);
+
+        btnCadastrar.setOnAction(e -> abrirTelaCadastroCliente());
+        btnDeletar.setOnAction(e -> abrirTelaDeleteCliente());
+        btnListar.setOnAction(e -> abrirTelaListarClientes()); // Ação do novo botão
+        btnVoltar.setOnAction(e -> stage.close());
+
+        mainLayout.getChildren().addAll(titulo, btnCadastrar, btnDeletar, btnListar, btnVoltar);
+
+        Scene scene = new Scene(mainLayout, 400, 350); // Aumentei a altura para acomodar o novo botão
+        stage.setScene(scene);
+        stage.show();
+    }
+    
+    // Novo método para listar clientes
+    private void abrirTelaListarClientes() {
+        Stage stage = new Stage();
+        stage.setTitle("Lista de Clientes");
+
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(20));
+        layout.setAlignment(Pos.CENTER);
+        
+        // Obter a lista de clientes do banco de dados
+        List<Cliente> listaClientes = connection.getTodosClientes();
+        
+        // Criar uma tabela para exibir os clientes
+        TableView<Cliente> tabelaClientes = new TableView<>();
+        tabelaClientes.setPrefHeight(400);
+        tabelaClientes.setPrefWidth(600);
+        
+        // Definir as colunas da tabela
+        TableColumn<Cliente, String> colNome = new TableColumn<>("Nome");
+        colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colNome.setPrefWidth(150);
+        
+        TableColumn<Cliente, String> colCPF = new TableColumn<>("CPF");
+        colCPF.setCellValueFactory(new PropertyValueFactory<>("cpf"));
+        colCPF.setPrefWidth(100);
+        
+        TableColumn<Cliente, String> colTelefone = new TableColumn<>("Telefone");
+        colTelefone.setCellValueFactory(new PropertyValueFactory<>("telefone"));
+        colTelefone.setPrefWidth(100);
+        
+        TableColumn<Cliente, String> colEndereco = new TableColumn<>("Endereço");
+        colEndereco.setCellValueFactory(new PropertyValueFactory<>("endereco"));
+        colEndereco.setPrefWidth(150);
+        
+        TableColumn<Cliente, String> colEmail = new TableColumn<>("Email");
+        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        colEmail.setPrefWidth(150);
+        
+        // Adicionar as colunas à tabela
+        tabelaClientes.getColumns().addAll(colNome, colCPF, colTelefone, colEndereco, colEmail);
+        
+        // Adicionar os clientes à tabela
+        tabelaClientes.setItems(FXCollections.observableArrayList(listaClientes));
+        
+        Button btnAtualizar = new Button("Atualizar Lista");
+        Button btnVoltar = new Button("Voltar");
+        
+        btnAtualizar.setOnAction(e -> {
+            List<Cliente> clientesAtualizados = connection.getTodosClientes();
+            tabelaClientes.setItems(FXCollections.observableArrayList(clientesAtualizados));
+        });
+        
+        btnVoltar.setOnAction(e -> stage.close());
+        
+        layout.getChildren().addAll(
+            new Label("Lista de Clientes"),
+            tabelaClientes,
+            btnAtualizar,
+            btnVoltar
+        );
+        
+        Scene scene = new Scene(layout, 650, 500);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private void abrirTelaCadastroCliente() {
+        Stage stage = new Stage();
+        stage.setTitle("Cadastro de Cliente");
+
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER);
@@ -139,7 +235,6 @@ public class Main extends Application {
         txtEmail.setPromptText("Email");
 
         Button btnSalvar = new Button("Salvar Cliente");
-        Button btnListar = new Button("Listar Clientes");
         Button btnVoltar = new Button("Voltar");
 
         btnSalvar.setOnAction(e -> {
@@ -188,31 +283,6 @@ public class Main extends Application {
             }
         });
 
-        btnListar.setOnAction(e -> {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Lista de Clientes:\n\n");
-
-            List<Cliente> listaClientes = connection.getTodosClientes();
-
-            for (Cliente cliente : listaClientes) {
-                sb.append(cliente.toString()).append("\n\n");
-            }
-            
-            TextArea textArea = new TextArea(sb.toString());
-            textArea.setEditable(false);
-            textArea.setPrefRowCount(10);
-            
-            Stage listStage = new Stage();
-            listStage.setTitle("Lista de Clientes");
-            VBox listLayout = new VBox(10);
-            listLayout.setPadding(new Insets(20));
-            listLayout.getChildren().add(textArea);
-            
-            Scene listScene = new Scene(listLayout, 400, 300);
-            listStage.setScene(listScene);
-            listStage.show();
-        });
-
         btnVoltar.setOnAction(e -> stage.close());
 
         layout.getChildren().addAll(
@@ -223,11 +293,90 @@ public class Main extends Application {
             txtEndereco,
             txtEmail,
             btnSalvar,
-            btnListar,
             btnVoltar
         );
 
-        Scene scene = new Scene(layout, 400, 500);
+        Scene scene = new Scene(layout, 400, 400);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private void abrirTelaDeleteCliente() {
+        Stage stage = new Stage();
+        stage.setTitle("Deletar Cliente");
+
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(20));
+        layout.setAlignment(Pos.CENTER);
+
+        // Obter a lista de clientes do banco de dados
+        List<Cliente> listaClientes = connection.getTodosClientes();
+        
+        // ComboBox para selecionar o cliente a ser deletado
+        ComboBox<Cliente> cboClientes = new ComboBox<>();
+        cboClientes.setPromptText("Selecione o cliente para deletar");
+        cboClientes.setItems(FXCollections.observableArrayList(listaClientes));
+        cboClientes.setPrefWidth(300);
+
+        Button btnDeletar = new Button("Deletar Cliente");
+        Button btnVoltar = new Button("Voltar");
+
+        btnDeletar.setOnAction(e -> {
+            Cliente clienteSelecionado = cboClientes.getValue();
+            if (clienteSelecionado != null) {
+                Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmacao.setTitle("Confirmar Exclusão");
+                confirmacao.setHeaderText("Excluir Cliente");
+                confirmacao.setContentText("Tem certeza que deseja excluir o cliente " + 
+                                          clienteSelecionado.getNome() + "?");
+                
+                Optional<ButtonType> resultado = confirmacao.showAndWait();
+                if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+                    try {
+                        // Remover o cliente do banco de dados
+                        System.out.println("ID do cliente a ser deletado: " + connection.getId(clienteSelecionado)); //debug
+                        int id = connection.getId(clienteSelecionado);
+                        try{
+                            connection.deleteClientePorId(id);
+                        } catch (Exception ex) {
+                            System.out.println("Erro ao deletar cliente: " + ex.getMessage()); 
+                        }
+                        
+                        // Remover o cliente da lista local
+                        clientes.remove(clienteSelecionado);
+                        
+                        // Atualizar a ComboBox
+                        cboClientes.getItems().remove(clienteSelecionado);
+                        
+                        Alert sucesso = new Alert(Alert.AlertType.INFORMATION);
+                        sucesso.setTitle("Sucesso");
+                        sucesso.setContentText("Cliente deletado com sucesso!");
+                        sucesso.showAndWait();
+                    } catch (Exception ex) {
+                        Alert erro = new Alert(Alert.AlertType.ERROR);
+                        erro.setTitle("Erro");
+                        erro.setContentText("Erro ao deletar cliente: " + ex.getMessage());
+                        erro.showAndWait();
+                    }
+                }
+            } else {
+                Alert alerta = new Alert(Alert.AlertType.WARNING);
+                alerta.setTitle("Aviso");
+                alerta.setContentText("Por favor, selecione um cliente para deletar.");
+                alerta.showAndWait();
+            }
+        });
+
+        btnVoltar.setOnAction(e -> stage.close());
+
+        layout.getChildren().addAll(
+            new Label("Selecione o cliente que deseja deletar:"),
+            cboClientes,
+            btnDeletar,
+            btnVoltar
+        );
+
+        Scene scene = new Scene(layout, 400, 300);
         stage.setScene(scene);
         stage.show();
     }

@@ -3,6 +3,27 @@
   "configurations": [
     {
       "type": "java",
+      "name": "teste",
+      "request": "launch",
+      "mainClass": "com.petshop/com.petshop.teste",
+      "projectName": "petshop-system"
+    },
+    {
+      "type": "java",
+      "name": "Connect",
+      "request": "launch",
+      "mainClass": "com.petshop/com.petshop.Connect",
+      "projectName": "petshop-system"
+    },
+    {
+      "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "com.petshop/com.petshop.Main",
+      "projectName": "petshop-system"
+    },
+    {
+      "type": "java",
       "name": "Launch Main",
       "request": "launch",
       "mainClass": "com.petshop.Main",

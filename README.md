@@ -52,6 +52,8 @@ O sistema segue um modelo orientado a objetos e conta com as seguintes classes p
 
 * Cliente: Representa um cliente do pet shop.
 
+* Connect: Classe de conexão e consulta ao banco de dados do sistema.
+
 * Pet: Representa um animal de estimação de um cliente.
 
 * Servico: Classe abstrata para serviços oferecidos pelo pet shop.
