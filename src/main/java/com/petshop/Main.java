@@ -16,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 
 public class Main extends Application {
     private List<Cliente> clientes = new ArrayList<>();
@@ -28,9 +29,10 @@ public class Main extends Application {
 
     public Main() {
         // Inicializa os veterinários padrão
+        /* SOMENTE PARA TESTE 
         veterinarios.add(new Veterinario("Luiza", "CRMV-1234", "Clínica Geral", 150.0));
         veterinarios.add(new Veterinario("Pedro", "CRMV-5678", "Ortopedia", 150.0));
-        veterinarios.add(new Veterinario("João", "CRMV-9012", "Dermatologia", 150.0));
+        veterinarios.add(new Veterinario("João", "CRMV-9012", "Dermatologia", 150.0)); */
     }
 
     // Método original main
@@ -823,8 +825,23 @@ public class Main extends Application {
                     {
                         connection.inserirBanhoTosa(cboCliente.getValue(), cboPet.getValue(), dtpData, chkTosaProfunda.isSelected(), chkPerfume.isSelected(), chkLacoGravata.isSelected(), precoTotal);
                     }
+                    if(cboTipoServico.getValue().equals("Consulta Veterinária"))
+                    {
+                        connection.inserirConsulta(cboCliente.getValue(), cboPet.getValue(), dtpData, cboVeterinario.getValue(), chkUrgente.isSelected(), precoTotal);
+                    }
+                    if(cboTipoServico.getValue().equals("Hospedagem"))
+                    {
+                        int dias = Integer.parseInt(txtDiasHospedagem.getText());
+                        connection.inserirHospedagem(cboCliente.getValue(), cboPet.getValue(), dtpData, dias, chkSuiteLuxo.isSelected(), chkServicoSpa.isSelected(), chkAlimentacaoEspecial.isSelected(), precoTotal);
+                    }
+                    if(cboTipoServico.getValue().equals("Adestramento"))
+                    {
+                        int numSessoes = Integer.parseInt(txtNumeroSessoes.getText());
+                        connection.inserirAdestramento(cboCliente.getValue(), cboPet.getValue(), dtpData, numSessoes, txtTipoTreinamento.getText(), chkAtendimentoDomiciliar.isSelected(), precoTotal);
+                    }
                     alert.setTitle("Sucesso");
                     alert.setContentText("Serviço agendado com sucesso!");
+                    connection.inserirServico(cboCliente.getValue(), cboPet.getValue(), dtpData, tipoServico, precoTotal);
                     alert.showAndWait();
                     stage.close();
                 }
@@ -1231,56 +1248,209 @@ public class Main extends Application {
         Button btnVoltar = new Button("Voltar");
 
         btnRelatorioClientes.setOnAction(e -> {
-            StringBuilder sb = new StringBuilder();
-            sb.append("RELATÓRIO DE CLIENTES\n");
-            sb.append("====================\n\n");
+            Stage listStage = new Stage();
+            listStage.setTitle("Lista de Clientes");
+
+            VBox listLayout = new VBox(10);
+            listLayout.setPadding(new Insets(20));
+            listLayout.setAlignment(Pos.CENTER);
             
-            for (Cliente cliente : clientes) {
-                sb.append("Cliente: ").append(cliente.getNome()).append("\n");
-                sb.append("CPF: ").append(cliente.getCpf()).append("\n");
-                sb.append("Telefone: ").append(cliente.getTelefone()).append("\n");
-                sb.append("Endereço: ").append(cliente.getEndereco()).append("\n");
-                sb.append("Email: ").append(cliente.getEmail()).append("\n");
-                sb.append("Pets: ").append(cliente.getPets().size()).append("\n");
-                sb.append("-------------------\n\n");
-            }
+            // Obter a lista de clientes do banco de dados
+            List<Cliente> listaClientes = connection.getTodosClientes();
             
-            mostrarRelatorio("Relatório de Clientes", sb.toString());
+            // Criar uma tabela para exibir os clientes
+            TableView<Cliente> tabelaClientes = new TableView<>();
+            tabelaClientes.setPrefHeight(400);
+            tabelaClientes.setPrefWidth(600);
+            
+            // Definir as colunas da tabela
+            TableColumn<Cliente, String> colNome = new TableColumn<>("Nome");
+            colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+            colNome.setPrefWidth(150);
+            
+            TableColumn<Cliente, String> colCPF = new TableColumn<>("CPF");
+            colCPF.setCellValueFactory(new PropertyValueFactory<>("cpf"));
+            colCPF.setPrefWidth(100);
+            
+            TableColumn<Cliente, String> colTelefone = new TableColumn<>("Telefone");
+            colTelefone.setCellValueFactory(new PropertyValueFactory<>("telefone"));
+            colTelefone.setPrefWidth(100);
+            
+            TableColumn<Cliente, String> colEndereco = new TableColumn<>("Endereço");
+            colEndereco.setCellValueFactory(new PropertyValueFactory<>("endereco"));
+            colEndereco.setPrefWidth(150);
+            
+            TableColumn<Cliente, String> colEmail = new TableColumn<>("Email");
+            colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+            colEmail.setPrefWidth(150);
+            
+            // Adicionar as colunas à tabela
+            tabelaClientes.getColumns().addAll(colNome, colCPF, colTelefone, colEndereco, colEmail);
+            
+            // Adicionar os clientes à tabela
+            tabelaClientes.setItems(FXCollections.observableArrayList(listaClientes));
+            
+            Button btnAtualizar = new Button("Atualizar Lista");
+            Button btnVoltar2 = new Button("Voltar");
+            
+            btnAtualizar.setOnAction(event -> {
+                List<Cliente> clientesAtualizados = connection.getTodosClientes();
+                tabelaClientes.setItems(FXCollections.observableArrayList(clientesAtualizados));
+            });
+            
+            btnVoltar2.setOnAction(event -> listStage.close());
+            
+            // Adicionar os componentes ao layout
+            listLayout.getChildren().addAll(
+                new Label("Relatório de Clientes"),
+                tabelaClientes,
+                new HBox(10, btnAtualizar, btnVoltar2)
+            );
+            
+            // Configurar e mostrar a cena
+            Scene listScene = new Scene(listLayout, 650, 500);
+            listStage.setScene(listScene);
+            listStage.show();
         });
 
         btnRelatorioPets.setOnAction(e -> {
-            StringBuilder sb = new StringBuilder();
-            sb.append("RELATÓRIO DE PETS\n");
-            sb.append("=================\n\n");
+            Stage listStage = new Stage();
+            listStage.setTitle("Lista de Pets");
+
+            VBox listLayout = new VBox(10);
+            listLayout.setPadding(new Insets(20));
+            listLayout.setAlignment(Pos.CENTER);
+
+            // Obter a lista de pets do banco de dados
+            List<Pet> listaPets = connection.getTodosPets();
+
+            // Criar uma tabela para exibir os pets
+            TableView<Pet> tabelaPets = new TableView<>();
+            tabelaPets.setPrefHeight(400);
+            tabelaPets.setPrefWidth(600);
+
+            // Definir as colunas da tabela
+            TableColumn<Pet, String> colNome = new TableColumn<>("Nome");
+            colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+            colNome.setPrefWidth(100);
+
+            TableColumn<Pet, String> colEspecie = new TableColumn<>("Espécie");
+            colEspecie.setCellValueFactory(new PropertyValueFactory<>("especie"));
+            colEspecie.setPrefWidth(100);
+
+            TableColumn<Pet, String> colRaca = new TableColumn<>("Raça");
+            colRaca.setCellValueFactory(new PropertyValueFactory<>("raca"));
+            colRaca.setPrefWidth(100);
+
+            TableColumn<Pet, Number> colPeso = new TableColumn<>("Peso");
+            colPeso.setCellValueFactory(new PropertyValueFactory<>("peso"));
+            colPeso.setPrefWidth(80);
+
+            TableColumn<Pet, Number> colIdade = new TableColumn<>("Idade");
+            colIdade.setCellValueFactory(new PropertyValueFactory<>("idade"));
+            colIdade.setPrefWidth(80);
+
+            TableColumn<Pet, String> colDono = new TableColumn<>("Dono");
+            colDono.setCellValueFactory(cellData -> {
+                Cliente dono = cellData.getValue().getDono();
+                return dono != null ? new javafx.beans.property.SimpleStringProperty(dono.getNome()) : new javafx.beans.property.SimpleStringProperty("");
+            });
+            colDono.setPrefWidth(140);
+
+            // Adicionar as colunas à tabela
+            tabelaPets.getColumns().addAll(colNome, colEspecie, colRaca, colPeso, colIdade, colDono);
+
+            // Adicionar os pets à tabela
+            tabelaPets.setItems(FXCollections.observableArrayList(listaPets));
+
+            Button btnAtualizar = new Button("Atualizar Lista");
+            Button btnVoltar2 = new Button("Voltar");
+
+            btnAtualizar.setOnAction(event -> {
+                List<Pet> petsAtualizados = connection.getTodosPets();
+                tabelaPets.setItems(FXCollections.observableArrayList(petsAtualizados));
+            });
+
+            btnVoltar2.setOnAction(event -> listStage.close());
             
-            for (Pet pet : pets) {
-                sb.append("Pet: ").append(pet.getNome()).append("\n");
-                sb.append("Espécie: ").append(pet.getEspecie()).append("\n");
-                sb.append("Raça: ").append(pet.getRaca()).append("\n");
-                sb.append("Idade: ").append(pet.getIdade()).append(" anos\n");
-                sb.append("Peso: ").append(pet.getPeso()).append(" kg\n");
-                sb.append("Dono: ").append(pet.getDono() != null ? pet.getDono().getNome() : "Não cadastrado").append("\n");
-                sb.append("-------------------\n\n");
-            }
+            // Adicionar os componentes ao layout
+            listLayout.getChildren().addAll(
+                new Label("Relatório de Pets"),
+                tabelaPets,
+                new HBox(10, btnAtualizar, btnVoltar2)
+            );
             
-            mostrarRelatorio("Relatório de Pets", sb.toString());
+            // Configurar e mostrar a cena
+            Scene listScene = new Scene(listLayout, 650, 500);
+            listStage.setScene(listScene);
+            listStage.show();
         });
 
         btnRelatorioServicos.setOnAction(e -> {
-            StringBuilder sb = new StringBuilder();
-            sb.append("RELATÓRIO DE SERVIÇOS\n");
-            sb.append("=====================\n\n");
+            Stage listStage = new Stage();
+            listStage.setTitle("Lista de Serviços");
+        
+            VBox listLayout = new VBox(10);
+            listLayout.setPadding(new Insets(20));
+            listLayout.setAlignment(Pos.CENTER);
             
-            for (Servico servico : servicos) {
-                sb.append("Serviço: ").append(servico.getDescricao()).append("\n");
-                sb.append("Preço: R$ ").append(servico.calcularPreco()).append("\n");
-                sb.append("Data: ").append(servico.getDataAgendamento()).append("\n");
-                sb.append("Cliente: ").append(servico.getCliente().getNome()).append("\n");
-                sb.append("Pet: ").append(servico.getPet().getNome()).append("\n");
-                sb.append("-------------------\n\n");
-            }
+            // Obter a lista de serviços do banco de dados
+            List<ServicoGenerico> listaServicos = connection.getTodosServicos();
             
-            mostrarRelatorio("Relatório de Serviços", sb.toString());
+            // Criar uma tabela para exibir os serviços
+            TableView<ServicoGenerico> tabelaServicos = new TableView<>();
+            tabelaServicos.setPrefHeight(400);
+            tabelaServicos.setPrefWidth(600);
+            
+            // Definir as colunas da tabela
+
+            TableColumn<ServicoGenerico, String> colCliente = new TableColumn<>("Cliente");
+            colCliente.setCellValueFactory(new PropertyValueFactory<>("nome_dono"));
+            colCliente.setPrefWidth(150);
+            
+            TableColumn<ServicoGenerico, String> colPet = new TableColumn<>("Pet");
+            colPet.setCellValueFactory(new PropertyValueFactory<>("nome_pet"));
+            colPet.setPrefWidth(100);
+
+            TableColumn<ServicoGenerico, String> colTipo = new TableColumn<>("Tipo");
+            colTipo.setCellValueFactory(new PropertyValueFactory<>("tipo_servico"));
+            colTipo.setPrefWidth(150);
+            
+            TableColumn<ServicoGenerico, Number> colPreco = new TableColumn<>("Preço");
+            colPreco.setCellValueFactory(new PropertyValueFactory<>("valor_servico"));
+            colPreco.setPrefWidth(100);
+            
+            TableColumn<ServicoGenerico, LocalDateTime> colData = new TableColumn<>("Data");
+            colData.setCellValueFactory(new PropertyValueFactory<>("dataAgendamento"));
+            colData.setPrefWidth(150);
+            
+            // Adicionar as colunas à tabela
+            tabelaServicos.getColumns().addAll(colCliente, colPet, colTipo, colPreco, colData);
+            
+            // Adicionar os serviços à tabela
+            tabelaServicos.setItems(FXCollections.observableArrayList(listaServicos));
+            
+            Button btnAtualizar = new Button("Atualizar Lista");
+            Button btnVoltar2 = new Button("Voltar");
+            
+            btnAtualizar.setOnAction(event -> {
+                List<ServicoGenerico> servicosAtualizados = connection.getTodosServicos();
+                tabelaServicos.setItems(FXCollections.observableArrayList(servicosAtualizados));
+            });
+            
+            btnVoltar2.setOnAction(event -> listStage.close());
+            
+            // Adicionar os componentes ao layout
+            listLayout.getChildren().addAll(
+                new Label("Relatório de Serviços"),
+                tabelaServicos,
+                new HBox(10, btnAtualizar, btnVoltar2)
+            );
+            
+            // Configurar e mostrar a cena
+            Scene listScene = new Scene(listLayout, 650, 500);
+            listStage.setScene(listScene);
+            listStage.show();
         });
 
         btnRelatorioPacotes.setOnAction(e -> {
@@ -1302,29 +1472,66 @@ public class Main extends Application {
         });
 
         btnRelatorioVeterinarios.setOnAction(e -> {
-            StringBuilder sb = new StringBuilder();
-            sb.append("RELATÓRIO DE VETERINÁRIOS\n");
-            sb.append("========================\n\n");
+            Stage listStage = new Stage();
+            listStage.setTitle("Lista de Veterinários");
+
+            VBox listLayout = new VBox(10);
+            listLayout.setPadding(new Insets(20));
+            listLayout.setAlignment(Pos.CENTER);
             
-            for (Veterinario vet : veterinarios) {
-                sb.append("Nome: ").append(vet.getNome()).append("\n");
-                sb.append("CRMV: ").append(vet.getCrmv()).append("\n");
-                sb.append("Especialidade: ").append(vet.getEspecialidade()).append("\n");
-                sb.append("Valor da Consulta: R$ ").append(vet.getValorConsulta()).append("\n");
-                
-                // Conta quantas consultas cada veterinário realizou
-                int consultas = 0;
-                for (Servico servico : servicos) {
-                    if (servico instanceof Consulta && 
-                        ((Consulta) servico).getVeterinario().equals(vet.getNome())) {
-                        consultas++;
-                    }
-                }
-                sb.append("Consultas Realizadas: ").append(consultas).append("\n");
-                sb.append("-------------------\n\n");
-            }
+            // Obter a lista de veterinários do banco de dados
+            List<Veterinario> listaVeterinarios = connection.getTodosVeterinarios();
             
-            mostrarRelatorio("Relatório de Veterinários", sb.toString());
+            // Criar uma tabela para exibir os veterinários
+            TableView<Veterinario> tabelaVeterinarios = new TableView<>();
+            tabelaVeterinarios.setPrefHeight(400);
+            tabelaVeterinarios.setPrefWidth(600);
+            
+            // Definir as colunas da tabela
+            TableColumn<Veterinario, String> colNome = new TableColumn<>("Nome");
+            colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+            colNome.setPrefWidth(150);
+            
+            TableColumn<Veterinario, String> colCRMV = new TableColumn<>("CRMV");
+            colCRMV.setCellValueFactory(new PropertyValueFactory<>("crmv"));
+            colCRMV.setPrefWidth(100);
+            
+            TableColumn<Veterinario, String> colEspecialidade = new TableColumn<>("Especialidade");
+            colEspecialidade.setCellValueFactory(new PropertyValueFactory<>("especialidade"));
+            colEspecialidade.setPrefWidth(150);
+            
+            TableColumn<Veterinario, Number> colValorConsulta = new TableColumn<>("Valor Consulta");
+            colValorConsulta.setCellValueFactory(new PropertyValueFactory<>("valorConsulta"));
+            colValorConsulta.setPrefWidth(120);
+            
+            // Adicionar as colunas à tabela
+            tabelaVeterinarios.getColumns().addAll(colNome, colCRMV, colEspecialidade, colValorConsulta);
+            
+            // Adicionar os veterinários à tabela (usando a lista do banco de dados)
+            tabelaVeterinarios.setItems(FXCollections.observableArrayList(listaVeterinarios));
+            
+            Button btnAtualizar = new Button("Atualizar Lista");
+            Button btnVoltar2 = new Button("Voltar");
+            
+            btnAtualizar.setOnAction(event -> {
+                // Atualizar a lista de veterinários do banco de dados
+                List<Veterinario> veterinariosAtualizados = connection.getTodosVeterinarios();
+                tabelaVeterinarios.setItems(FXCollections.observableArrayList(veterinariosAtualizados));
+            });
+            
+            btnVoltar2.setOnAction(event -> listStage.close());
+            
+            // Adicionar os componentes ao layout
+            listLayout.getChildren().addAll(
+                new Label("Relatório de Veterinários"),
+                tabelaVeterinarios,
+                new HBox(10, btnAtualizar, btnVoltar2)
+            );
+            
+            // Configurar e mostrar a cena
+            Scene listScene = new Scene(listLayout, 670, 500);
+            listStage.setScene(listScene);
+            listStage.show();
         });
 
         btnVoltar.setOnAction(e -> stage.close());
@@ -1431,6 +1638,7 @@ public class Main extends Application {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Sucesso");
                 alert.setContentText("Veterinário cadastrado com sucesso!");
+                connection.inserirVeterinario(novoVet);
                 alert.showAndWait();
                 
                 limparCampos(txtNome, txtCrmv, txtEspecialidade, txtValorConsulta);
@@ -1448,26 +1656,68 @@ public class Main extends Application {
         });
 
         btnListar.setOnAction(e -> {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Lista de Veterinários:\n\n");
-            for (Veterinario vet : veterinarios) {
-                sb.append(vet.toString()).append("\n\n");
-            }
-            
-            TextArea textArea = new TextArea(sb.toString());
-            textArea.setEditable(false);
-            textArea.setPrefRowCount(10);
-            
             Stage listStage = new Stage();
             listStage.setTitle("Lista de Veterinários");
+
             VBox listLayout = new VBox(10);
             listLayout.setPadding(new Insets(20));
-            listLayout.getChildren().add(textArea);
+            listLayout.setAlignment(Pos.CENTER);
             
-            Scene listScene = new Scene(listLayout, 400, 300);
+            // Obter a lista de veterinários do banco de dados
+            List<Veterinario> listaVeterinarios = connection.getTodosVeterinarios();
+            
+            // Criar uma tabela para exibir os veterinários
+            TableView<Veterinario> tabelaVeterinarios = new TableView<>();
+            tabelaVeterinarios.setPrefHeight(400);
+            tabelaVeterinarios.setPrefWidth(600);
+            
+            // Definir as colunas da tabela
+            TableColumn<Veterinario, String> colNome = new TableColumn<>("Nome");
+            colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+            colNome.setPrefWidth(150);
+            
+            TableColumn<Veterinario, String> colCRMV = new TableColumn<>("CRMV");
+            colCRMV.setCellValueFactory(new PropertyValueFactory<>("crmv"));
+            colCRMV.setPrefWidth(100);
+            
+            TableColumn<Veterinario, String> colEspecialidade = new TableColumn<>("Especialidade");
+            colEspecialidade.setCellValueFactory(new PropertyValueFactory<>("especialidade"));
+            colEspecialidade.setPrefWidth(150);
+            
+            TableColumn<Veterinario, Number> colValorConsulta = new TableColumn<>("Valor Consulta");
+            colValorConsulta.setCellValueFactory(new PropertyValueFactory<>("valorConsulta"));
+            colValorConsulta.setPrefWidth(120);
+            
+            // Adicionar as colunas à tabela
+            tabelaVeterinarios.getColumns().addAll(colNome, colCRMV, colEspecialidade, colValorConsulta);
+            
+            // Adicionar os veterinários à tabela (usando a lista do banco de dados)
+            tabelaVeterinarios.setItems(FXCollections.observableArrayList(listaVeterinarios));
+            
+            Button btnAtualizar = new Button("Atualizar Lista");
+            Button btnVoltar2 = new Button("Voltar");
+            
+            btnAtualizar.setOnAction(event -> {
+                // Atualizar a lista de veterinários do banco de dados
+                List<Veterinario> veterinariosAtualizados = connection.getTodosVeterinarios();
+                tabelaVeterinarios.setItems(FXCollections.observableArrayList(veterinariosAtualizados));
+            });
+            
+            btnVoltar2.setOnAction(event -> listStage.close());
+            
+            // Adicionar os componentes ao layout
+            listLayout.getChildren().addAll(
+                new Label("Relatório de Veterinários"),
+                tabelaVeterinarios,
+                new HBox(10, btnAtualizar, btnVoltar2)
+            );
+            
+            // Configurar e mostrar a cena
+            Scene listScene = new Scene(listLayout, 670, 500);
             listStage.setScene(listScene);
             listStage.show();
         });
+            
 
         btnVoltar.setOnAction(e -> stage.close());
 
@@ -1487,4 +1737,3 @@ public class Main extends Application {
         stage.show();
     }
 }
-

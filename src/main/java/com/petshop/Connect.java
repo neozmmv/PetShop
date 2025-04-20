@@ -125,6 +125,129 @@ public class Connect {
         }
     }
 
+    public boolean inserirConsulta(Cliente cliente, Pet pet, DatePicker datapicker, Veterinario veterinario, boolean urgente, double precoTotal) {
+        String sql = "INSERT INTO consulta (nome_cliente, nome_pet, data_servico, veterinario, urgente, valor_consulta) VALUES (?, ?, ?, ?, ?, ?)";
+        java.sql.Date data = java.sql.Date.valueOf(datapicker.getValue()); //converte do datapicker para um valor armazenavel no banco
+
+        try {
+            Connection conn = getConnection();
+            if (conn == null) {
+                System.err.println("Erro: conexão não estabelecida.");
+                return false;
+            }
+
+            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, cliente.getNome());
+            pstmt.setString(2, pet.getNome());
+            pstmt.setDate(3, data);
+            pstmt.setString(4, veterinario.getNome());
+            pstmt.setBoolean(5, urgente);
+            pstmt.setDouble(6, precoTotal);
+
+            int rows = pstmt.executeUpdate();
+            pstmt.close();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean inserirServico(Cliente cliente, Pet pet, DatePicker datapicker, String tipo_servico, double precoTotal) {
+        String sql = "INSERT INTO servicos (nome_cliente, nome_pet, data, tipo_servico, valor_servico) VALUES (?, ?, ?, ?, ?)";
+        java.sql.Date data = java.sql.Date.valueOf(datapicker.getValue()); //converte do datapicker para um valor armazenavel no banco
+
+        try {
+            Connection conn = getConnection();
+            if (conn == null) {
+                System.err.println("Erro: conexão não estabelecida.");
+                throw new SQLException("Conexão não estabelecida");
+            }
+
+            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, cliente.getNome());
+            pstmt.setString(2, pet.getNome());
+            pstmt.setDate(3, data);
+            pstmt.setString(4, tipo_servico);
+            pstmt.setDouble(5, precoTotal);
+
+
+            int rows = pstmt.executeUpdate();
+            pstmt.close();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean inserirHospedagem(Cliente cliente, Pet pet, DatePicker datapicker, int numeroDias, boolean suiteLuxo, boolean servicoSpa, boolean alimentacao, double precoTotal) {
+        String sql = "INSERT INTO hospedagem (nome_cliente, nome_pet, data_servico, numero_dias, suite_luxo, servico_spa, alimentacao_especial, valor_servico) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        java.sql.Date data = java.sql.Date.valueOf(datapicker.getValue()); //converte do datapicker para um valor armazenavel no banco
+
+        try {
+            Connection conn = getConnection();
+            if (conn == null) {
+                System.err.println("Erro: conexão não estabelecida.");
+                return false;
+            }
+
+            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, cliente.getNome());
+            pstmt.setString(2, pet.getNome());
+            pstmt.setDate(3, data);
+            pstmt.setInt(4, numeroDias);
+            pstmt.setBoolean(5, suiteLuxo);
+            pstmt.setBoolean(6, servicoSpa);
+            pstmt.setBoolean(7, alimentacao);
+            pstmt.setDouble(8, precoTotal);
+
+            int rows = pstmt.executeUpdate();
+            pstmt.close();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean inserirAdestramento(Cliente cliente, Pet pet, DatePicker datapicker, int numeroSessoes, String tipoTreinamento, boolean domiciliar, double precoTotal) {
+        String sql = "INSERT INTO adestramento (nome_cliente, nome_pet, data_servico, numero_sessoes, tipo_treinamento, domiciliar, valor_servico) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        java.sql.Date data = java.sql.Date.valueOf(datapicker.getValue()); //converte do datapicker para um valor armazenavel no banco
+
+        try {
+            Connection conn = getConnection();
+            if (conn == null) {
+                System.err.println("Erro: conexão não estabelecida.");
+                return false;
+            }
+
+            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, cliente.getNome());
+            pstmt.setString(2, pet.getNome());
+            pstmt.setDate(3, data);
+            pstmt.setInt(4, numeroSessoes);
+            pstmt.setString(5, tipoTreinamento);
+            pstmt.setBoolean(6, domiciliar);
+            pstmt.setDouble(7, precoTotal);
+
+            int rows = pstmt.executeUpdate();
+            pstmt.close();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public int getId(Cliente cliente) {
         String sql = "SELECT id FROM clientes WHERE NOME = ? and TELEFONE = ?";
 
@@ -162,7 +285,7 @@ public class Connect {
         try {
             if (conn == null) {
                 System.err.println("Erro: Conexão não estabelecida. Chame getConnection() primeiro.");
-                return lista;
+                throw new SQLException("Conexão não estabelecida");
             }
 
             Statement stmt = conn.createStatement();
@@ -186,6 +309,92 @@ public class Connect {
         return lista;
     }
 
+    public List<ServicoGenerico> getTodosServicos() {
+        List<ServicoGenerico> lista = new ArrayList<>();
+
+        try {
+            if (conn == null) {
+                System.err.println("Erro: Conexão não estabelecida. Chame getConnection() primeiro.");
+                throw new SQLException("Conexão não estabelecida");
+            }
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("select nome_cliente, nome_pet, data, tipo_servico, valor_servico FROM servicos");
+
+            while (rs.next()) {
+                ServicoGenerico servico = new ServicoGenerico(
+                        rs.getString("nome_cliente"),
+                        rs.getString("nome_pet"),
+                        rs.getDate("data"),
+                        rs.getString("tipo_servico"),
+                        rs.getDouble("valor_servico")
+                );
+                lista.add(servico);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
+
+    public boolean inserirVeterinario(Veterinario vet) {
+        String sql = "INSERT INTO veterinarios (nome, crmv, especialidade, valor_consulta) VALUES (?, ?, ?, ?)";
+
+        try {
+            Connection conn = getConnection();
+            if (conn == null) {
+                System.err.println("Erro: conexão não estabelecida.");
+                throw new SQLException("Conexão não estabelecida");
+            }
+
+            java.sql.PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, vet.getNome());
+            pstmt.setString(2, vet.getCrmv());
+            pstmt.setString(3, vet.getEspecialidade());
+            pstmt.setDouble(4, vet.getValorConsulta());
+            
+
+            int rows = pstmt.executeUpdate();
+            pstmt.close();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<Veterinario> getTodosVeterinarios() {
+        List<Veterinario> lista = new ArrayList<>();
+
+        try {
+            if (conn == null) {
+                System.err.println("Erro: Conexão não estabelecida. Chame getConnection() primeiro.");
+                throw new SQLException("Conexão não estabelecida");
+            }
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT nome, crmv, especialidade, valor_consulta FROM veterinarios");
+
+            while (rs.next()) {
+                Veterinario vet = new Veterinario(
+                        rs.getString("nome"),
+                        rs.getString("crmv"),
+                        rs.getString("especialidade"),
+                        rs.getDouble("valor_consulta")
+                );
+                lista.add(vet);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
 
     public boolean deleteClientePorId(int id) {
         String sql = "DELETE FROM clientes WHERE id = ?";

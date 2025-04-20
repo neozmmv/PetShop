@@ -26,6 +26,11 @@ public class Pet {
         this.dono = null;
     }
 
+    public Pet(String nome)
+    {
+        this.nome = nome;
+    }
+
     //crie a classe pet e as funções básicas
     public String getNome() {
         return nome;
