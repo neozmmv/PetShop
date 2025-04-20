@@ -16,6 +16,21 @@ public class Pet {
         this.peso = peso;
         this.dono = null;
     }
+
+    public Pet(String nome, String especie, String raca, double peso, int idade) {
+        this.nome = nome;
+        this.especie = especie;
+        this.raca = raca;
+        this.idade = idade;
+        this.peso = peso;
+        this.dono = null;
+    }
+
+    public Pet(String nome)
+    {
+        this.nome = nome;
+    }
+
     //crie a classe pet e as funções básicas
     public String getNome() {
         return nome;
@@ -68,6 +83,6 @@ public class Pet {
     @Override
     public String toString() {
         return "Pet: " + nome + ", Espécie: " + especie + ", Raça: " + raca + 
-               ", Idade: " + idade + ", Peso: " + peso + "kg";
+               ", Idade: " + idade + ", Peso: " + peso + "kg" + ", Dono: " + dono.getNome();
     }
 }

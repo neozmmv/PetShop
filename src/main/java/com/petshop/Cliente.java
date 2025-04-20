@@ -1,11 +1,15 @@
 package com.petshop;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 //import java.sql.Connection; //Bibliotecas de acesso ao banco de dados
 //import java.sql.DriverManager; //Descomentar quando for implementar o acesso ao banco
 
 public class Cliente {
+    private int id; //id do cliente no banco de dados.
     private String nome;
     private String cpf;
     private String telefone;
@@ -24,11 +28,25 @@ public class Cliente {
         this.pets = new ArrayList<>();
     }
 
+    //construtor só com o nome
+    //necessário para conseguir buscar o dono do pet pelo nome
+    public Cliente(String nome) {
+        this.nome = nome;
+        this.cpf = "";
+        this.telefone = "";
+        this.endereco = "";
+        this.email = "";
+        this.pets = new ArrayList<>();
+    }
+
+
     // Funções de pegar informação (cliente.nome(), cliente.email(), etc...)
     // adicionei as funções relacionadas à classe pet e ao cliente
     public void adicionarPet(Pet pet) {
         pets.add(pet);
     }
+
+    // !! getID() está na classe Connect
 
     public void removerPet(Pet pet) {
         pets.remove(pet);

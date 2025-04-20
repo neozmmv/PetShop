@@ -17,6 +17,9 @@ public abstract class Servico {
         this.cliente = cliente;
         this.pet = pet;
     }
+
+    //outro construtor
+    
     
     public abstract double calcularPreco();
     
