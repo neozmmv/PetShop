@@ -128,7 +128,80 @@ O sistema segue um modelo orientado a objetos e conta com as seguintes classes p
 +---------------+---------------+------+-----+---------+----------------+
 ```
 
-* Mais tabelas serão adicionadas conforme o avanço do projeto.
+* Tabela Adestramento:
+```
++------------------+---------------+------+-----+---------+----------------+
+| Field            | Type          | Null | Key | Default | Extra          |
++------------------+---------------+------+-----+---------+----------------+
+| id               | int           | NO   | PRI | NULL    | auto_increment |
+| nome_cliente     | text          | NO   |     | NULL    |                |
+| nome_pet         | text          | NO   |     | NULL    |                |
+| data_servico     | date          | NO   |     | NULL    |                |
+| numero_sessoes   | int           | NO   |     | NULL    |                |
+| tipo_treinamento | text          | NO   |     | NULL    |                |
+| domiciliar       | tinyint(1)    | YES  |     | 0       |                |
+| valor_servico    | decimal(10,2) | NO   |     | NULL    |                |
++------------------+---------------+------+-----+---------+----------------+
+```
+
+* Tabela Consulta:
+```
++----------------+---------------+------+-----+---------+----------------+
+| Field          | Type          | Null | Key | Default | Extra          |
++----------------+---------------+------+-----+---------+----------------+
+| id             | int           | NO   | PRI | NULL    | auto_increment |
+| nome_cliente   | text          | NO   |     | NULL    |                |
+| nome_pet       | text          | NO   |     | NULL    |                |
+| data_servico   | date          | NO   |     | NULL    |                |
+| veterinario    | text          | NO   |     | NULL    |                |
+| urgente        | tinyint(1)    | YES  |     | 0       |                |
+| valor_consulta | decimal(10,2) | NO   |     | NULL    |                |
++----------------+---------------+------+-----+---------+----------------+
+```
+
+* Tabela Hospedagem:
+```
++----------------------+---------------+------+-----+---------+----------------+
+| Field                | Type          | Null | Key | Default | Extra          |
++----------------------+---------------+------+-----+---------+----------------+
+| id                   | int           | NO   | PRI | NULL    | auto_increment |
+| nome_cliente         | text          | NO   |     | NULL    |                |
+| nome_pet             | text          | NO   |     | NULL    |                |
+| data_servico         | date          | NO   |     | NULL    |                |
+| numero_dias          | int           | NO   |     | NULL    |                |
+| suite_luxo           | tinyint(1)    | YES  |     | 0       |                |
+| servico_spa          | tinyint(1)    | YES  |     | 0       |                |
+| alimentacao_especial | tinyint(1)    | YES  |     | 0       |                |
+| valor_servico        | decimal(10,2) | NO   |     | NULL    |                |
++----------------------+---------------+------+-----+---------+----------------+
+```
+
+* Tabela Serviços:
+```
++---------------+---------------+------+-----+---------+----------------+
+| Field         | Type          | Null | Key | Default | Extra          |
++---------------+---------------+------+-----+---------+----------------+
+| id            | int           | NO   | PRI | NULL    | auto_increment |
+| nome_cliente  | varchar(100)  | YES  |     | NULL    |                |
+| nome_pet      | varchar(100)  | NO   |     | NULL    |                |
+| data          | date          | YES  |     | NULL    |                |
+| tipo_servico  | varchar(100)  | YES  |     | NULL    |                |
+| valor_servico | decimal(10,2) | NO   |     | NULL    |                |
++---------------+---------------+------+-----+---------+----------------+
+```
+
+* Tabela Veterinários:
+```
++----------------+---------------+------+-----+---------+----------------+
+| Field          | Type          | Null | Key | Default | Extra          |
++----------------+---------------+------+-----+---------+----------------+
+| id             | int           | NO   | PRI | NULL    | auto_increment |
+| nome           | varchar(100)  | NO   |     | NULL    |                |
+| crmv           | varchar(20)   | NO   | UNI | NULL    |                |
+| especialidade  | varchar(100)  | YES  |     | NULL    |                |
+| valor_consulta | decimal(10,2) | NO   |     | NULL    |                |
++----------------+---------------+------+-----+---------+----------------+
+```
 
 ## Autores
 
