@@ -29,15 +29,20 @@ public class Main extends Application {
 
     public Main() {
         // Inicializa os veterinários padrão
-        /* SOMENTE PARA TESTE 
-        veterinarios.add(new Veterinario("Luiza", "CRMV-1234", "Clínica Geral", 150.0));
-        veterinarios.add(new Veterinario("Pedro", "CRMV-5678", "Ortopedia", 150.0));
-        veterinarios.add(new Veterinario("João", "CRMV-9012", "Dermatologia", 150.0)); */
+        /*
+         * SOMENTE PARA TESTE
+         * veterinarios.add(new Veterinario("Luiza", "CRMV-1234", "Clínica Geral",
+         * 150.0));
+         * veterinarios.add(new Veterinario("Pedro", "CRMV-5678", "Ortopedia", 150.0));
+         * veterinarios.add(new Veterinario("João", "CRMV-9012", "Dermatologia",
+         * 150.0));
+         */
     }
 
     // Método original main
     public static void main(String[] args) {
         // Inicia a aplicação JavaFX
+        //Versão sem gerenciamento de pacotes.
         launch(args);
     }
 
@@ -69,7 +74,7 @@ public class Main extends Application {
         new Thread(() -> executarCodigoOriginal()).start();
 
         primaryStage.setTitle("Sistema PetShop");
-        //abrir janela em 800x600\
+        // abrir janela em 800x600\
         primaryStage.setWidth(800);
         primaryStage.setHeight(600);
 
@@ -100,7 +105,8 @@ public class Main extends Application {
         btnRelatorios.setStyle(buttonStyle);
         btnSair.setStyle(buttonStyle);
 
-        mainLayout.getChildren().addAll(titulo, btnCliente, btnPet, btnServico, btnPacotes, btnVeterinarios, btnRelatorios, btnSair);
+        mainLayout.getChildren().addAll(titulo, btnCliente, btnPet, btnServico, btnVeterinarios, btnRelatorios,
+                btnSair);
 
         // Ações dos botões
         btnCliente.setOnAction(e -> abrirTelaClientes());
@@ -150,7 +156,7 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
     }
-    
+
     // Novo método para listar clientes
     private void abrirTelaListarClientes() {
         Stage stage = new Stage();
@@ -159,59 +165,58 @@ public class Main extends Application {
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER);
-        
+
         // Obter a lista de clientes do banco de dados
         List<Cliente> listaClientes = connection.getTodosClientes();
-        
+
         // Criar uma tabela para exibir os clientes
         TableView<Cliente> tabelaClientes = new TableView<>();
         tabelaClientes.setPrefHeight(400);
         tabelaClientes.setPrefWidth(600);
-        
+
         // Definir as colunas da tabela
         TableColumn<Cliente, String> colNome = new TableColumn<>("Nome");
         colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
         colNome.setPrefWidth(150);
-        
+
         TableColumn<Cliente, String> colCPF = new TableColumn<>("CPF");
         colCPF.setCellValueFactory(new PropertyValueFactory<>("cpf"));
         colCPF.setPrefWidth(100);
-        
+
         TableColumn<Cliente, String> colTelefone = new TableColumn<>("Telefone");
         colTelefone.setCellValueFactory(new PropertyValueFactory<>("telefone"));
         colTelefone.setPrefWidth(100);
-        
+
         TableColumn<Cliente, String> colEndereco = new TableColumn<>("Endereço");
         colEndereco.setCellValueFactory(new PropertyValueFactory<>("endereco"));
         colEndereco.setPrefWidth(150);
-        
+
         TableColumn<Cliente, String> colEmail = new TableColumn<>("Email");
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         colEmail.setPrefWidth(150);
-        
+
         // Adicionar as colunas à tabela
         tabelaClientes.getColumns().addAll(colNome, colCPF, colTelefone, colEndereco, colEmail);
-        
+
         // Adicionar os clientes à tabela
         tabelaClientes.setItems(FXCollections.observableArrayList(listaClientes));
-        
+
         Button btnAtualizar = new Button("Atualizar Lista");
         Button btnVoltar = new Button("Voltar");
-        
+
         btnAtualizar.setOnAction(e -> {
             List<Cliente> clientesAtualizados = connection.getTodosClientes();
             tabelaClientes.setItems(FXCollections.observableArrayList(clientesAtualizados));
         });
-        
+
         btnVoltar.setOnAction(e -> stage.close());
-        
+
         layout.getChildren().addAll(
-            new Label("Lista de Clientes"),
-            tabelaClientes,
-            btnAtualizar,
-            btnVoltar
-        );
-        
+                new Label("Lista de Clientes"),
+                tabelaClientes,
+                btnAtualizar,
+                btnVoltar);
+
         Scene scene = new Scene(layout, 650, 500);
         stage.setScene(scene);
         stage.show();
@@ -256,21 +261,20 @@ public class Main extends Application {
                 }
 
                 Cliente novoCliente = new Cliente(
-                    txtNome.getText(),
-                    txtCpf.getText(),
-                    txtTelefone.getText(),
-                    txtEndereco.getText()
-                );
+                        txtNome.getText(),
+                        txtCpf.getText(),
+                        txtTelefone.getText(),
+                        txtEndereco.getText());
                 novoCliente.setEmail(txtEmail.getText());
                 clientes.add(novoCliente);
 
-                connection.inserirCliente(novoCliente); //adiciona no banco de dados.
-                
+                connection.inserirCliente(novoCliente); // adiciona no banco de dados.
+
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Sucesso");
                 alert.setContentText("Cliente cadastrado com sucesso!");
                 alert.showAndWait();
-                
+
                 limparCampos(txtNome, txtCpf, txtTelefone, txtEndereco, txtEmail);
             } catch (IllegalArgumentException ex) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -288,15 +292,14 @@ public class Main extends Application {
         btnVoltar.setOnAction(e -> stage.close());
 
         layout.getChildren().addAll(
-            new Label("Cadastro de Cliente"),
-            txtNome,
-            txtCpf,
-            txtTelefone,
-            txtEndereco,
-            txtEmail,
-            btnSalvar,
-            btnVoltar
-        );
+                new Label("Cadastro de Cliente"),
+                txtNome,
+                txtCpf,
+                txtTelefone,
+                txtEndereco,
+                txtEmail,
+                btnSalvar,
+                btnVoltar);
 
         Scene scene = new Scene(layout, 400, 400);
         stage.setScene(scene);
@@ -313,7 +316,7 @@ public class Main extends Application {
 
         // Obter a lista de clientes do banco de dados
         List<Cliente> listaClientes = connection.getTodosClientes();
-        
+
         // ComboBox para selecionar o cliente a ser deletado
         ComboBox<Cliente> cboClientes = new ComboBox<>();
         cboClientes.setPromptText("Selecione o cliente para deletar");
@@ -329,27 +332,27 @@ public class Main extends Application {
                 Alert confirmacao = new Alert(Alert.AlertType.CONFIRMATION);
                 confirmacao.setTitle("Confirmar Exclusão");
                 confirmacao.setHeaderText("Excluir Cliente");
-                confirmacao.setContentText("Tem certeza que deseja excluir o cliente " + 
-                                          clienteSelecionado.getNome() + "?");
-                
+                confirmacao.setContentText("Tem certeza que deseja excluir o cliente " +
+                        clienteSelecionado.getNome() + "?");
+
                 Optional<ButtonType> resultado = confirmacao.showAndWait();
                 if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
                     try {
                         // Remover o cliente do banco de dados
-                        System.out.println("ID do cliente a ser deletado: " + connection.getId(clienteSelecionado)); //debug
+                        System.out.println("ID do cliente a ser deletado: " + connection.getId(clienteSelecionado)); // debug
                         int id = connection.getId(clienteSelecionado);
-                        try{
+                        try {
                             connection.deleteClientePorId(id);
                         } catch (Exception ex) {
-                            System.out.println("Erro ao deletar cliente: " + ex.getMessage()); 
+                            System.out.println("Erro ao deletar cliente: " + ex.getMessage());
                         }
-                        
+
                         // Remover o cliente da lista local
                         clientes.remove(clienteSelecionado);
-                        
+
                         // Atualizar a ComboBox
                         cboClientes.getItems().remove(clienteSelecionado);
-                        
+
                         Alert sucesso = new Alert(Alert.AlertType.INFORMATION);
                         sucesso.setTitle("Sucesso");
                         sucesso.setContentText("Cliente deletado com sucesso!");
@@ -372,11 +375,10 @@ public class Main extends Application {
         btnVoltar.setOnAction(e -> stage.close());
 
         layout.getChildren().addAll(
-            new Label("Selecione o cliente que deseja deletar:"),
-            cboClientes,
-            btnDeletar,
-            btnVoltar
-        );
+                new Label("Selecione o cliente que deseja deletar:"),
+                cboClientes,
+                btnDeletar,
+                btnVoltar);
 
         Scene scene = new Scene(layout, 400, 300);
         stage.setScene(scene);
@@ -410,7 +412,7 @@ public class Main extends Application {
         Button btnVoltar = new Button("Voltar");
 
         // Atualiza a lista de clientes no ComboBox
-        //cboDono.getItems().addAll(clientes);
+        // cboDono.getItems().addAll(clientes);
         cboDono.setItems(FXCollections.observableArrayList(listaClientes));
 
         btnSalvar.setOnAction(e -> {
@@ -436,28 +438,27 @@ public class Main extends Application {
                 }
 
                 Pet novoPet = new Pet(
-                    txtNome.getText(),
-                    txtRaca.getText(),
-                    Double.parseDouble(txtPeso.getText()),
-                    Integer.parseInt(txtIdade.getText())
-                );
+                        txtNome.getText(),
+                        txtRaca.getText(),
+                        Double.parseDouble(txtPeso.getText()),
+                        Integer.parseInt(txtIdade.getText()));
                 novoPet.setEspecie(txtEspecie.getText());
-                
+
                 Cliente donoSelecionado = cboDono.getValue();
                 if (donoSelecionado != null) {
                     novoPet.setDono(donoSelecionado);
                     donoSelecionado.adicionarPet(novoPet);
                 }
-                
+
                 pets.add(novoPet);
 
                 connection.inserirPet(novoPet);
-                
+
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Sucesso");
                 alert.setContentText("Pet cadastrado com sucesso!");
                 alert.showAndWait();
-                
+
                 limparCampos(txtNome, txtRaca, txtPeso, txtIdade, txtEspecie);
                 cboDono.setValue(null);
             } catch (NumberFormatException ex) {
@@ -478,74 +479,73 @@ public class Main extends Application {
             }
         });
 
-
         btnListar.setOnAction(e -> {
             Stage listStage = new Stage();
             listStage.setTitle("Lista de Pets");
-            
+
             VBox listLayout = new VBox(10);
             listLayout.setPadding(new Insets(20));
             listLayout.setAlignment(Pos.CENTER);
-            
+
             // Obter a lista de pets do banco de dados
             List<Pet> listaPets = connection.getTodosPets();
-            
+
             // Criar uma tabela para exibir os pets
             TableView<Pet> tabelaPets = new TableView<>();
             tabelaPets.setPrefHeight(400);
             tabelaPets.setPrefWidth(600);
-            
+
             // Definir as colunas da tabela
             TableColumn<Pet, String> colNome = new TableColumn<>("Nome");
             colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
             colNome.setPrefWidth(100);
-            
+
             TableColumn<Pet, String> colEspecie = new TableColumn<>("Espécie");
             colEspecie.setCellValueFactory(new PropertyValueFactory<>("especie"));
             colEspecie.setPrefWidth(100);
-            
+
             TableColumn<Pet, String> colRaca = new TableColumn<>("Raça");
             colRaca.setCellValueFactory(new PropertyValueFactory<>("raca"));
             colRaca.setPrefWidth(100);
-            
+
             TableColumn<Pet, Number> colPeso = new TableColumn<>("Peso");
             colPeso.setCellValueFactory(new PropertyValueFactory<>("peso"));
             colPeso.setPrefWidth(80);
-            
+
             TableColumn<Pet, Number> colIdade = new TableColumn<>("Idade");
             colIdade.setCellValueFactory(new PropertyValueFactory<>("idade"));
             colIdade.setPrefWidth(80);
-            
+
             TableColumn<Pet, String> colDono = new TableColumn<>("Dono");
             colDono.setCellValueFactory(cellData -> {
                 Cliente dono = cellData.getValue().getDono();
-                return dono != null ? new javafx.beans.property.SimpleStringProperty(dono.getNome()) : new javafx.beans.property.SimpleStringProperty("");
+                return dono != null ? new javafx.beans.property.SimpleStringProperty(dono.getNome())
+                        : new javafx.beans.property.SimpleStringProperty("");
             });
             colDono.setPrefWidth(140);
-            
+
             // Adicionar as colunas à tabela
             tabelaPets.getColumns().addAll(colNome, colEspecie, colRaca, colPeso, colIdade, colDono);
-            
+
             // Adicionar os pets à tabela
             tabelaPets.setItems(FXCollections.observableArrayList(listaPets));
-            
+
             Button btnAtualizar = new Button("Atualizar Lista");
             Button btnVoltar2 = new Button("Voltar");
-            
+
             btnAtualizar.setOnAction(event -> {
                 List<Pet> petsAtualizados = connection.getTodosPets();
                 tabelaPets.setItems(FXCollections.observableArrayList(petsAtualizados));
             });
-            
+
             btnVoltar2.setOnAction(event -> listStage.close());
-            
+
             listLayout.getChildren().addAll(
-                new Label("Lista de Pets"),
-                tabelaPets,
-                btnAtualizar,
-                btnVoltar2
-            );
-            
+                    new Label("Lista de Pets"),
+                    tabelaPets,
+                    btnAtualizar,
+                    btnVoltar2);
+
             Scene listScene = new Scene(listLayout, 650, 500);
             listStage.setScene(listScene);
             listStage.show();
@@ -554,17 +554,16 @@ public class Main extends Application {
         btnVoltar.setOnAction(e -> stage.close());
 
         layout.getChildren().addAll(
-            new Label("Cadastro de Pet"),
-            txtNome,
-            txtRaca,
-            txtPeso,
-            txtIdade,
-            txtEspecie,
-            cboDono,
-            btnSalvar,
-            btnListar,
-            btnVoltar
-        );
+                new Label("Cadastro de Pet"),
+                txtNome,
+                txtRaca,
+                txtPeso,
+                txtIdade,
+                txtEspecie,
+                cboDono,
+                btnSalvar,
+                btnListar,
+                btnVoltar);
 
         Scene scene = new Scene(layout, 400, 500);
         stage.setScene(scene);
@@ -591,16 +590,16 @@ public class Main extends Application {
         // Campos comuns
         ComboBox<Cliente> cboCliente = new ComboBox<>();
         cboCliente.setPromptText("Selecione o Cliente");
-        //puxar os clientes do banco
+        // puxar os clientes do banco
         List<Cliente> listaClientes = connection.getTodosClientes();
         cboCliente.setItems(FXCollections.observableArrayList(listaClientes));
-        //cboCliente.getItems().addAll(clientes);
+        // cboCliente.getItems().addAll(clientes);
 
         ComboBox<Pet> cboPet = new ComboBox<>();
         cboPet.setPromptText("Selecione o Pet");
 
         List<Pet> listaPets = connection.getTodosPets();
-        //cboPet.setItems(FXCollections.observableArrayList(listaPets));
+        // cboPet.setItems(FXCollections.observableArrayList(listaPets));
 
         DatePicker dtpData = new DatePicker();
         dtpData.setPromptText("Data do Serviço");
@@ -654,8 +653,8 @@ public class Main extends Application {
         cboCliente.setOnAction(e -> {
             Cliente clienteSelecionado = cboCliente.getValue();
             if (clienteSelecionado != null) {
-                System.out.println(clienteSelecionado); //debug
-                System.out.println(connection.getPetsByClientName(clienteSelecionado.getNome())); //debug
+                System.out.println(clienteSelecionado); // debug
+                System.out.println(connection.getPetsByClientName(clienteSelecionado.getNome())); // debug
                 cboPet.getItems().clear();
                 cboPet.getItems().addAll(connection.getPetsByClientName(clienteSelecionado.getNome()));
             }
@@ -693,35 +692,42 @@ public class Main extends Application {
             try {
                 String tipoServico = cboTipoServico.getValue();
 
-
                 switch (tipoServico) {
                     case "Banho e Tosa":
                         precoTotal = 100; // Preço base
-                        if (chkTosaProfunda.isSelected()) precoTotal += 50;
-                        if (chkPerfume.isSelected()) precoTotal += 30;
-                        if (chkLacoGravata.isSelected()) precoTotal += 20;
+                        if (chkTosaProfunda.isSelected())
+                            precoTotal += 50;
+                        if (chkPerfume.isSelected())
+                            precoTotal += 30;
+                        if (chkLacoGravata.isSelected())
+                            precoTotal += 20;
                         break;
 
                     case "Consulta Veterinária":
                         Veterinario vet = cboVeterinario.getValue();
                         if (vet != null) {
                             precoTotal = vet.getValorConsulta();
-                            if (chkUrgente.isSelected()) precoTotal *= 1.5;
+                            if (chkUrgente.isSelected())
+                                precoTotal *= 1.5;
                         }
                         break;
 
                     case "Hospedagem":
                         int dias = Integer.parseInt(txtDiasHospedagem.getText());
                         precoTotal = 100 * dias; // Preço base por dia
-                        if (chkSuiteLuxo.isSelected()) precoTotal += 100 * dias;
-                        if (chkServicoSpa.isSelected()) precoTotal += 80 * dias;
-                        if (chkAlimentacaoEspecial.isSelected()) precoTotal += 50 * dias;
+                        if (chkSuiteLuxo.isSelected())
+                            precoTotal += 100 * dias;
+                        if (chkServicoSpa.isSelected())
+                            precoTotal += 80 * dias;
+                        if (chkAlimentacaoEspecial.isSelected())
+                            precoTotal += 50 * dias;
                         break;
 
                     case "Adestramento":
                         int sessoes = Integer.parseInt(txtNumeroSessoes.getText());
                         precoTotal = 150 * sessoes; // Preço base por sessão
-                        if (chkAtendimentoDomiciliar.isSelected()) precoTotal += 100 * sessoes;
+                        if (chkAtendimentoDomiciliar.isSelected())
+                            precoTotal += 100 * sessoes;
                         break;
                 }
 
@@ -734,8 +740,7 @@ public class Main extends Application {
             }
         });
 
-
-        //fazer a partir do banho e tosa
+        // fazer a partir do banho e tosa
         btnAgendar.setOnAction(e -> {
             try {
                 // Validação dos campos obrigatórios
@@ -797,51 +802,53 @@ public class Main extends Application {
                 }
 
                 Servico servico = criarServico(
-                    tipoServico,
-                    cboCliente.getValue(),
-                    cboPet.getValue(),
-                    0, // Preço inicial zero
-                    dtpData.getValue().atStartOfDay(),
-                    chkTosaProfunda.isSelected(),
-                    chkPerfume.isSelected(),
-                    chkLacoGravata.isSelected(),
-                    cboVeterinario.getValue() != null ? cboVeterinario.getValue().getNome() : "",
-                    chkUrgente.isSelected(),
-                    chkSuiteLuxo.isSelected(),
-                    chkServicoSpa.isSelected(),
-                    chkAlimentacaoEspecial.isSelected(),
-                    valorDiaria,
-                    numeroSessoes,
-                    tipoTreinamento,
-                    chkAtendimentoDomiciliar.isSelected()
-                );
+                        tipoServico,
+                        cboCliente.getValue(),
+                        cboPet.getValue(),
+                        0, // Preço inicial zero
+                        dtpData.getValue().atStartOfDay(),
+                        chkTosaProfunda.isSelected(),
+                        chkPerfume.isSelected(),
+                        chkLacoGravata.isSelected(),
+                        cboVeterinario.getValue() != null ? cboVeterinario.getValue().getNome() : "",
+                        chkUrgente.isSelected(),
+                        chkSuiteLuxo.isSelected(),
+                        chkServicoSpa.isSelected(),
+                        chkAlimentacaoEspecial.isSelected(),
+                        valorDiaria,
+                        numeroSessoes,
+                        tipoTreinamento,
+                        chkAtendimentoDomiciliar.isSelected());
 
-                //parte de salvar o agendamento
+                // parte de salvar o agendamento
                 if (servico != null) {
                     servicos.add(servico);
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    //fazer a checagem do tipo de servico para salvar nas tabelas certas!!
-                    if(cboTipoServico.getValue().equals("Banho e Tosa"))
-                    {
-                        connection.inserirBanhoTosa(cboCliente.getValue(), cboPet.getValue(), dtpData, chkTosaProfunda.isSelected(), chkPerfume.isSelected(), chkLacoGravata.isSelected(), precoTotal);
+                    // fazer a checagem do tipo de servico para salvar nas tabelas certas!!
+                    if (cboTipoServico.getValue().equals("Banho e Tosa")) {
+                        connection.inserirBanhoTosa(cboCliente.getValue(), cboPet.getValue(), dtpData,
+                                chkTosaProfunda.isSelected(), chkPerfume.isSelected(), chkLacoGravata.isSelected(),
+                                precoTotal);
                     }
-                    if(cboTipoServico.getValue().equals("Consulta Veterinária"))
-                    {
-                        connection.inserirConsulta(cboCliente.getValue(), cboPet.getValue(), dtpData, cboVeterinario.getValue(), chkUrgente.isSelected(), precoTotal);
+                    if (cboTipoServico.getValue().equals("Consulta Veterinária")) {
+                        connection.inserirConsulta(cboCliente.getValue(), cboPet.getValue(), dtpData,
+                                cboVeterinario.getValue(), chkUrgente.isSelected(), precoTotal);
                     }
-                    if(cboTipoServico.getValue().equals("Hospedagem"))
-                    {
+                    if (cboTipoServico.getValue().equals("Hospedagem")) {
                         int dias = Integer.parseInt(txtDiasHospedagem.getText());
-                        connection.inserirHospedagem(cboCliente.getValue(), cboPet.getValue(), dtpData, dias, chkSuiteLuxo.isSelected(), chkServicoSpa.isSelected(), chkAlimentacaoEspecial.isSelected(), precoTotal);
+                        connection.inserirHospedagem(cboCliente.getValue(), cboPet.getValue(), dtpData, dias,
+                                chkSuiteLuxo.isSelected(), chkServicoSpa.isSelected(),
+                                chkAlimentacaoEspecial.isSelected(), precoTotal);
                     }
-                    if(cboTipoServico.getValue().equals("Adestramento"))
-                    {
+                    if (cboTipoServico.getValue().equals("Adestramento")) {
                         int numSessoes = Integer.parseInt(txtNumeroSessoes.getText());
-                        connection.inserirAdestramento(cboCliente.getValue(), cboPet.getValue(), dtpData, numSessoes, txtTipoTreinamento.getText(), chkAtendimentoDomiciliar.isSelected(), precoTotal);
+                        connection.inserirAdestramento(cboCliente.getValue(), cboPet.getValue(), dtpData, numSessoes,
+                                txtTipoTreinamento.getText(), chkAtendimentoDomiciliar.isSelected(), precoTotal);
                     }
                     alert.setTitle("Sucesso");
                     alert.setContentText("Serviço agendado com sucesso!");
-                    connection.inserirServico(cboCliente.getValue(), cboPet.getValue(), dtpData, tipoServico, precoTotal);
+                    connection.inserirServico(cboCliente.getValue(), cboPet.getValue(), dtpData, tipoServico,
+                            precoTotal);
                     alert.showAndWait();
                     stage.close();
                 }
@@ -862,36 +869,34 @@ public class Main extends Application {
 
         // Adiciona todos os campos ao layout
         camposServico.getChildren().addAll(
-            cboCliente,
-            cboPet,
-            dtpData,
-            camposBanhoTosa,
-            camposConsulta,
-            camposHospedagem,
-            camposAdestramento,
-            lblPrecoTotal
-        );
+                cboCliente,
+                cboPet,
+                dtpData,
+                camposBanhoTosa,
+                camposConsulta,
+                camposHospedagem,
+                camposAdestramento,
+                lblPrecoTotal);
 
         layout.getChildren().addAll(
-            new Label("Agendamento de Serviço"),
-            cboTipoServico,
-            camposServico,
-            btnCalcular,
-            btnAgendar,
-            btnVoltar
-        );
+                new Label("Agendamento de Serviço"),
+                cboTipoServico,
+                camposServico,
+                btnCalcular,
+                btnAgendar,
+                btnVoltar);
 
         Scene scene = new Scene(layout, 400, 600);
         stage.setScene(scene);
         stage.show();
     }
 
-    private Servico criarServico(String tipo, Cliente cliente, Pet pet, double preco, 
-                                LocalDateTime data, boolean tosaProfunda, boolean perfume, 
-                                boolean lacoGravata, String veterinario, boolean urgente,
-                                boolean suiteLuxo, boolean servicoSpa, boolean alimentacaoEspecial,
-                                double valorDiaria, int numeroSessoes, String tipoTreinamento,
-                                boolean atendimentoDomiciliar) {
+    private Servico criarServico(String tipo, Cliente cliente, Pet pet, double preco,
+            LocalDateTime data, boolean tosaProfunda, boolean perfume,
+            boolean lacoGravata, String veterinario, boolean urgente,
+            boolean suiteLuxo, boolean servicoSpa, boolean alimentacaoEspecial,
+            double valorDiaria, int numeroSessoes, String tipoTreinamento,
+            boolean atendimentoDomiciliar) {
         if (cliente == null || pet == null) {
             throw new IllegalArgumentException("Cliente e Pet são obrigatórios");
         }
@@ -902,8 +907,8 @@ public class Main extends Application {
 
         switch (tipo) {
             case "Banho e Tosa":
-                return new BanhoETosa("Banho e Tosa", preco, data, cliente, pet, 
-                                     tosaProfunda, perfume, lacoGravata);
+                return new BanhoETosa("Banho e Tosa", preco, data, cliente, pet,
+                        tosaProfunda, perfume, lacoGravata);
             case "Consulta Veterinária":
                 if (veterinario == null || veterinario.trim().isEmpty()) {
                     throw new IllegalArgumentException("Veterinário é obrigatório para consultas");
@@ -914,13 +919,13 @@ public class Main extends Application {
                     precoConsulta *= 1.5; // Adiciona 50% se for urgente
                 }
                 return new Consulta("Consulta Veterinária", precoConsulta, data, cliente, pet,
-                                  veterinario, urgente);
+                        veterinario, urgente);
             case "Hospedagem":
                 if (valorDiaria <= 0) {
                     throw new IllegalArgumentException("Valor da diária deve ser maior que zero");
                 }
                 return new Hospedagem("Hospedagem", preco, data, cliente, pet,
-                                    suiteLuxo, servicoSpa, alimentacaoEspecial, valorDiaria);
+                        suiteLuxo, servicoSpa, alimentacaoEspecial, valorDiaria);
             case "Adestramento":
                 if (numeroSessoes <= 0) {
                     throw new IllegalArgumentException("Número de sessões deve ser maior que zero");
@@ -929,7 +934,7 @@ public class Main extends Application {
                     throw new IllegalArgumentException("Tipo de treinamento é obrigatório");
                 }
                 return new Adestramento("Adestramento", preco, data, cliente, pet,
-                                      numeroSessoes, tipoTreinamento, atendimentoDomiciliar);
+                        numeroSessoes, tipoTreinamento, atendimentoDomiciliar);
             default:
                 throw new IllegalArgumentException("Tipo de serviço inválido: " + tipo);
         }
@@ -993,7 +998,7 @@ public class Main extends Application {
 
                 Cliente cliente = cboCliente.getValue();
                 Pet pet = cboPet.getValue();
-                
+
                 if (cliente == null) {
                     throw new IllegalArgumentException("Selecione o cliente");
                 }
@@ -1020,7 +1025,7 @@ public class Main extends Application {
 
                 // Cria o pacote
                 PacoteServicos pacote = new PacoteServicos(txtNome.getText().trim(), desconto, cliente, pet);
-                
+
                 // Adiciona os serviços ao pacote
                 for (Servico servico : lstServicos.getItems()) {
                     try {
@@ -1032,16 +1037,17 @@ public class Main extends Application {
 
                 // Calcula o preço total
                 double precoTotal = pacote.calcularPrecoTotal();
-                
+
                 // Adiciona o pacote à lista
                 pacotes.add(pacote);
 
                 // Mostra mensagem de sucesso
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Sucesso");
-                alert.setContentText(String.format("Pacote criado com sucesso!\nPreço total com desconto: R$ %.2f", precoTotal));
+                alert.setContentText(
+                        String.format("Pacote criado com sucesso!\nPreço total com desconto: R$ %.2f", precoTotal));
                 alert.showAndWait();
-                
+
                 stage.close();
             } catch (IllegalArgumentException ex) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -1062,17 +1068,17 @@ public class Main extends Application {
             for (PacoteServicos pacote : pacotes) {
                 sb.append(pacote.toString()).append("\n\n");
             }
-            
+
             TextArea textArea = new TextArea(sb.toString());
             textArea.setEditable(false);
             textArea.setPrefRowCount(10);
-            
+
             Stage listStage = new Stage();
             listStage.setTitle("Lista de Pacotes");
             VBox listLayout = new VBox(10);
             listLayout.setPadding(new Insets(20));
             listLayout.getChildren().add(textArea);
-            
+
             Scene listScene = new Scene(listLayout, 400, 300);
             listStage.setScene(listScene);
             listStage.show();
@@ -1081,19 +1087,18 @@ public class Main extends Application {
         btnVoltar.setOnAction(e -> stage.close());
 
         layout.getChildren().addAll(
-            new Label("Criação de Pacote de Serviços"),
-            txtNome,
-            txtDesconto,
-            cboCliente,
-            cboPet,
-            new Label("Serviços do Pacote:"),
-            lstServicos,
-            btnAdicionarServico,
-            btnRemoverServico,
-            btnSalvar,
-            btnListar,
-            btnVoltar
-        );
+                new Label("Criação de Pacote de Serviços"),
+                txtNome,
+                txtDesconto,
+                cboCliente,
+                cboPet,
+                new Label("Serviços do Pacote:"),
+                lstServicos,
+                btnAdicionarServico,
+                btnRemoverServico,
+                btnSalvar,
+                btnListar,
+                btnVoltar);
 
         Scene scene = new Scene(layout, 400, 500);
         stage.setScene(scene);
@@ -1136,13 +1141,13 @@ public class Main extends Application {
         cboPet.setOnAction(e -> {
             Cliente clienteSelecionado = cboCliente.getValue();
             Pet petSelecionado = cboPet.getValue();
-            
+
             if (clienteSelecionado != null && petSelecionado != null) {
                 lstServicosDisponiveis.getItems().clear();
                 // Filtra os serviços pelo cliente e pet selecionados
                 for (Servico servico : servicos) {
-                    if (servico.getCliente().equals(clienteSelecionado) && 
-                        servico.getPet().equals(petSelecionado)) {
+                    if (servico.getCliente().equals(clienteSelecionado) &&
+                            servico.getPet().equals(petSelecionado)) {
                         lstServicosDisponiveis.getItems().add(servico);
                     }
                 }
@@ -1169,30 +1174,48 @@ public class Main extends Application {
                 if (!lstServicos.getItems().contains(servicoSelecionado)) {
                     // Calcula o preço do serviço antes de adicioná-lo ao pacote
                     double precoCalculado = servicoSelecionado.calcularPreco();
-                    
+
                     // Cria uma cópia do serviço com o preço calculado
                     Servico servicoComPreco = criarServico(
-                        servicoSelecionado.getDescricao(),
-                        servicoSelecionado.getCliente(),
-                        servicoSelecionado.getPet(),
-                        servicoSelecionado instanceof Consulta ? 
-                            getValorConsultaVeterinario(((Consulta) servicoSelecionado).getVeterinario()) : 
-                            precoCalculado,
-                        servicoSelecionado.getDataAgendamento(),
-                        servicoSelecionado instanceof BanhoETosa ? ((BanhoETosa) servicoSelecionado).isTosaProfunda() : false,
-                        servicoSelecionado instanceof BanhoETosa ? ((BanhoETosa) servicoSelecionado).isPerfume() : false,
-                        servicoSelecionado instanceof BanhoETosa ? ((BanhoETosa) servicoSelecionado).isLacoOuGravata() : false,
-                        servicoSelecionado instanceof Consulta ? ((Consulta) servicoSelecionado).getVeterinario() : "",
-                        servicoSelecionado instanceof Consulta ? ((Consulta) servicoSelecionado).isConsultaUrgente() : false,
-                        servicoSelecionado instanceof Hospedagem ? ((Hospedagem) servicoSelecionado).isSuiteLuxo() : false,
-                        servicoSelecionado instanceof Hospedagem ? ((Hospedagem) servicoSelecionado).isServicoSpa() : false,
-                        servicoSelecionado instanceof Hospedagem ? ((Hospedagem) servicoSelecionado).isAlimentacaoEspecial() : false,
-                        servicoSelecionado instanceof Hospedagem ? ((Hospedagem) servicoSelecionado).getValorDiaria() : 0,
-                        servicoSelecionado instanceof Adestramento ? ((Adestramento) servicoSelecionado).getNumeroSessoes() : 0,
-                        servicoSelecionado instanceof Adestramento ? ((Adestramento) servicoSelecionado).getTipoTreinamento() : "",
-                        servicoSelecionado instanceof Adestramento ? ((Adestramento) servicoSelecionado).isAtendimentoDomiciliar() : false
-                    );
-                    
+                            servicoSelecionado.getDescricao(),
+                            servicoSelecionado.getCliente(),
+                            servicoSelecionado.getPet(),
+                            servicoSelecionado instanceof Consulta
+                                    ? getValorConsultaVeterinario(((Consulta) servicoSelecionado).getVeterinario())
+                                    : precoCalculado,
+                            servicoSelecionado.getDataAgendamento(),
+                            servicoSelecionado instanceof BanhoETosa
+                                    ? ((BanhoETosa) servicoSelecionado).isTosaProfunda()
+                                    : false,
+                            servicoSelecionado instanceof BanhoETosa ? ((BanhoETosa) servicoSelecionado).isPerfume()
+                                    : false,
+                            servicoSelecionado instanceof BanhoETosa
+                                    ? ((BanhoETosa) servicoSelecionado).isLacoOuGravata()
+                                    : false,
+                            servicoSelecionado instanceof Consulta ? ((Consulta) servicoSelecionado).getVeterinario()
+                                    : "",
+                            servicoSelecionado instanceof Consulta ? ((Consulta) servicoSelecionado).isConsultaUrgente()
+                                    : false,
+                            servicoSelecionado instanceof Hospedagem ? ((Hospedagem) servicoSelecionado).isSuiteLuxo()
+                                    : false,
+                            servicoSelecionado instanceof Hospedagem ? ((Hospedagem) servicoSelecionado).isServicoSpa()
+                                    : false,
+                            servicoSelecionado instanceof Hospedagem
+                                    ? ((Hospedagem) servicoSelecionado).isAlimentacaoEspecial()
+                                    : false,
+                            servicoSelecionado instanceof Hospedagem
+                                    ? ((Hospedagem) servicoSelecionado).getValorDiaria()
+                                    : 0,
+                            servicoSelecionado instanceof Adestramento
+                                    ? ((Adestramento) servicoSelecionado).getNumeroSessoes()
+                                    : 0,
+                            servicoSelecionado instanceof Adestramento
+                                    ? ((Adestramento) servicoSelecionado).getTipoTreinamento()
+                                    : "",
+                            servicoSelecionado instanceof Adestramento
+                                    ? ((Adestramento) servicoSelecionado).isAtendimentoDomiciliar()
+                                    : false);
+
                     lstServicos.getItems().add(servicoComPreco);
                     stage.close();
                 } else {
@@ -1207,15 +1230,14 @@ public class Main extends Application {
         btnCancelar.setOnAction(e -> stage.close());
 
         layout.getChildren().addAll(
-            new Label("Selecione o Cliente e Pet:"),
-            cboCliente,
-            cboPet,
-            new Label("Serviços Disponíveis:"),
-            lstServicosDisponiveis,
-            lblPrecoServico,
-            btnAdicionar,
-            btnCancelar
-        );
+                new Label("Selecione o Cliente e Pet:"),
+                cboCliente,
+                cboPet,
+                new Label("Serviços Disponíveis:"),
+                lstServicosDisponiveis,
+                lblPrecoServico,
+                btnAdicionar,
+                btnCancelar);
 
         Scene scene = new Scene(layout, 400, 500);
         stage.setScene(scene);
@@ -1254,59 +1276,58 @@ public class Main extends Application {
             VBox listLayout = new VBox(10);
             listLayout.setPadding(new Insets(20));
             listLayout.setAlignment(Pos.CENTER);
-            
+
             // Obter a lista de clientes do banco de dados
             List<Cliente> listaClientes = connection.getTodosClientes();
-            
+
             // Criar uma tabela para exibir os clientes
             TableView<Cliente> tabelaClientes = new TableView<>();
             tabelaClientes.setPrefHeight(400);
             tabelaClientes.setPrefWidth(600);
-            
+
             // Definir as colunas da tabela
             TableColumn<Cliente, String> colNome = new TableColumn<>("Nome");
             colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
             colNome.setPrefWidth(150);
-            
+
             TableColumn<Cliente, String> colCPF = new TableColumn<>("CPF");
             colCPF.setCellValueFactory(new PropertyValueFactory<>("cpf"));
             colCPF.setPrefWidth(100);
-            
+
             TableColumn<Cliente, String> colTelefone = new TableColumn<>("Telefone");
             colTelefone.setCellValueFactory(new PropertyValueFactory<>("telefone"));
             colTelefone.setPrefWidth(100);
-            
+
             TableColumn<Cliente, String> colEndereco = new TableColumn<>("Endereço");
             colEndereco.setCellValueFactory(new PropertyValueFactory<>("endereco"));
             colEndereco.setPrefWidth(150);
-            
+
             TableColumn<Cliente, String> colEmail = new TableColumn<>("Email");
             colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
             colEmail.setPrefWidth(150);
-            
+
             // Adicionar as colunas à tabela
             tabelaClientes.getColumns().addAll(colNome, colCPF, colTelefone, colEndereco, colEmail);
-            
+
             // Adicionar os clientes à tabela
             tabelaClientes.setItems(FXCollections.observableArrayList(listaClientes));
-            
+
             Button btnAtualizar = new Button("Atualizar Lista");
             Button btnVoltar2 = new Button("Voltar");
-            
+
             btnAtualizar.setOnAction(event -> {
                 List<Cliente> clientesAtualizados = connection.getTodosClientes();
                 tabelaClientes.setItems(FXCollections.observableArrayList(clientesAtualizados));
             });
-            
+
             btnVoltar2.setOnAction(event -> listStage.close());
-            
+
             // Adicionar os componentes ao layout
             listLayout.getChildren().addAll(
-                new Label("Relatório de Clientes"),
-                tabelaClientes,
-                new HBox(10, btnAtualizar, btnVoltar2)
-            );
-            
+                    new Label("Relatório de Clientes"),
+                    tabelaClientes,
+                    new HBox(10, btnAtualizar, btnVoltar2));
+
             // Configurar e mostrar a cena
             Scene listScene = new Scene(listLayout, 650, 500);
             listStage.setScene(listScene);
@@ -1353,7 +1374,8 @@ public class Main extends Application {
             TableColumn<Pet, String> colDono = new TableColumn<>("Dono");
             colDono.setCellValueFactory(cellData -> {
                 Cliente dono = cellData.getValue().getDono();
-                return dono != null ? new javafx.beans.property.SimpleStringProperty(dono.getNome()) : new javafx.beans.property.SimpleStringProperty("");
+                return dono != null ? new javafx.beans.property.SimpleStringProperty(dono.getNome())
+                        : new javafx.beans.property.SimpleStringProperty("");
             });
             colDono.setPrefWidth(140);
 
@@ -1372,14 +1394,13 @@ public class Main extends Application {
             });
 
             btnVoltar2.setOnAction(event -> listStage.close());
-            
+
             // Adicionar os componentes ao layout
             listLayout.getChildren().addAll(
-                new Label("Relatório de Pets"),
-                tabelaPets,
-                new HBox(10, btnAtualizar, btnVoltar2)
-            );
-            
+                    new Label("Relatório de Pets"),
+                    tabelaPets,
+                    new HBox(10, btnAtualizar, btnVoltar2));
+
             // Configurar e mostrar a cena
             Scene listScene = new Scene(listLayout, 650, 500);
             listStage.setScene(listScene);
@@ -1389,25 +1410,25 @@ public class Main extends Application {
         btnRelatorioServicos.setOnAction(e -> {
             Stage listStage = new Stage();
             listStage.setTitle("Lista de Serviços");
-        
+
             VBox listLayout = new VBox(10);
             listLayout.setPadding(new Insets(20));
             listLayout.setAlignment(Pos.CENTER);
-            
+
             // Obter a lista de serviços do banco de dados
             List<ServicoGenerico> listaServicos = connection.getTodosServicos();
-            
+
             // Criar uma tabela para exibir os serviços
             TableView<ServicoGenerico> tabelaServicos = new TableView<>();
             tabelaServicos.setPrefHeight(400);
             tabelaServicos.setPrefWidth(600);
-            
+
             // Definir as colunas da tabela
 
             TableColumn<ServicoGenerico, String> colCliente = new TableColumn<>("Cliente");
             colCliente.setCellValueFactory(new PropertyValueFactory<>("nome_dono"));
             colCliente.setPrefWidth(150);
-            
+
             TableColumn<ServicoGenerico, String> colPet = new TableColumn<>("Pet");
             colPet.setCellValueFactory(new PropertyValueFactory<>("nome_pet"));
             colPet.setPrefWidth(100);
@@ -1415,38 +1436,37 @@ public class Main extends Application {
             TableColumn<ServicoGenerico, String> colTipo = new TableColumn<>("Tipo");
             colTipo.setCellValueFactory(new PropertyValueFactory<>("tipo_servico"));
             colTipo.setPrefWidth(150);
-            
+
             TableColumn<ServicoGenerico, Number> colPreco = new TableColumn<>("Preço");
             colPreco.setCellValueFactory(new PropertyValueFactory<>("valor_servico"));
             colPreco.setPrefWidth(100);
-            
+
             TableColumn<ServicoGenerico, LocalDateTime> colData = new TableColumn<>("Data");
             colData.setCellValueFactory(new PropertyValueFactory<>("dataAgendamento"));
             colData.setPrefWidth(150);
-            
+
             // Adicionar as colunas à tabela
             tabelaServicos.getColumns().addAll(colCliente, colPet, colTipo, colPreco, colData);
-            
+
             // Adicionar os serviços à tabela
             tabelaServicos.setItems(FXCollections.observableArrayList(listaServicos));
-            
+
             Button btnAtualizar = new Button("Atualizar Lista");
             Button btnVoltar2 = new Button("Voltar");
-            
+
             btnAtualizar.setOnAction(event -> {
                 List<ServicoGenerico> servicosAtualizados = connection.getTodosServicos();
                 tabelaServicos.setItems(FXCollections.observableArrayList(servicosAtualizados));
             });
-            
+
             btnVoltar2.setOnAction(event -> listStage.close());
-            
+
             // Adicionar os componentes ao layout
             listLayout.getChildren().addAll(
-                new Label("Relatório de Serviços"),
-                tabelaServicos,
-                new HBox(10, btnAtualizar, btnVoltar2)
-            );
-            
+                    new Label("Relatório de Serviços"),
+                    tabelaServicos,
+                    new HBox(10, btnAtualizar, btnVoltar2));
+
             // Configurar e mostrar a cena
             Scene listScene = new Scene(listLayout, 650, 500);
             listStage.setScene(listScene);
@@ -1457,7 +1477,7 @@ public class Main extends Application {
             StringBuilder sb = new StringBuilder();
             sb.append("RELATÓRIO DE PACOTES\n");
             sb.append("====================\n\n");
-            
+
             for (PacoteServicos pacote : pacotes) {
                 sb.append("Pacote: ").append(pacote.getNome()).append("\n");
                 sb.append("Cliente: ").append(pacote.getCliente().getNome()).append("\n");
@@ -1467,7 +1487,7 @@ public class Main extends Application {
                 sb.append("Serviços incluídos: ").append(pacote.getServicos().size()).append("\n");
                 sb.append("-------------------\n\n");
             }
-            
+
             mostrarRelatorio("Relatório de Pacotes", sb.toString());
         });
 
@@ -1478,56 +1498,55 @@ public class Main extends Application {
             VBox listLayout = new VBox(10);
             listLayout.setPadding(new Insets(20));
             listLayout.setAlignment(Pos.CENTER);
-            
+
             // Obter a lista de veterinários do banco de dados
             List<Veterinario> listaVeterinarios = connection.getTodosVeterinarios();
-            
+
             // Criar uma tabela para exibir os veterinários
             TableView<Veterinario> tabelaVeterinarios = new TableView<>();
             tabelaVeterinarios.setPrefHeight(400);
             tabelaVeterinarios.setPrefWidth(600);
-            
+
             // Definir as colunas da tabela
             TableColumn<Veterinario, String> colNome = new TableColumn<>("Nome");
             colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
             colNome.setPrefWidth(150);
-            
+
             TableColumn<Veterinario, String> colCRMV = new TableColumn<>("CRMV");
             colCRMV.setCellValueFactory(new PropertyValueFactory<>("crmv"));
             colCRMV.setPrefWidth(100);
-            
+
             TableColumn<Veterinario, String> colEspecialidade = new TableColumn<>("Especialidade");
             colEspecialidade.setCellValueFactory(new PropertyValueFactory<>("especialidade"));
             colEspecialidade.setPrefWidth(150);
-            
+
             TableColumn<Veterinario, Number> colValorConsulta = new TableColumn<>("Valor Consulta");
             colValorConsulta.setCellValueFactory(new PropertyValueFactory<>("valorConsulta"));
             colValorConsulta.setPrefWidth(120);
-            
+
             // Adicionar as colunas à tabela
             tabelaVeterinarios.getColumns().addAll(colNome, colCRMV, colEspecialidade, colValorConsulta);
-            
+
             // Adicionar os veterinários à tabela (usando a lista do banco de dados)
             tabelaVeterinarios.setItems(FXCollections.observableArrayList(listaVeterinarios));
-            
+
             Button btnAtualizar = new Button("Atualizar Lista");
             Button btnVoltar2 = new Button("Voltar");
-            
+
             btnAtualizar.setOnAction(event -> {
                 // Atualizar a lista de veterinários do banco de dados
                 List<Veterinario> veterinariosAtualizados = connection.getTodosVeterinarios();
                 tabelaVeterinarios.setItems(FXCollections.observableArrayList(veterinariosAtualizados));
             });
-            
+
             btnVoltar2.setOnAction(event -> listStage.close());
-            
+
             // Adicionar os componentes ao layout
             listLayout.getChildren().addAll(
-                new Label("Relatório de Veterinários"),
-                tabelaVeterinarios,
-                new HBox(10, btnAtualizar, btnVoltar2)
-            );
-            
+                    new Label("Relatório de Veterinários"),
+                    tabelaVeterinarios,
+                    new HBox(10, btnAtualizar, btnVoltar2));
+
             // Configurar e mostrar a cena
             Scene listScene = new Scene(listLayout, 670, 500);
             listStage.setScene(listScene);
@@ -1537,14 +1556,12 @@ public class Main extends Application {
         btnVoltar.setOnAction(e -> stage.close());
 
         layout.getChildren().addAll(
-            new Label("Relatórios"),
-            btnRelatorioClientes,
-            btnRelatorioPets,
-            btnRelatorioServicos,
-            btnRelatorioPacotes,
-            btnRelatorioVeterinarios,
-            btnVoltar
-        );
+                new Label("Relatórios"),
+                btnRelatorioClientes,
+                btnRelatorioPets,
+                btnRelatorioServicos,
+                btnRelatorioVeterinarios,
+                btnVoltar);
 
         Scene scene = new Scene(layout, 400, 300);
         stage.setScene(scene);
@@ -1628,19 +1645,18 @@ public class Main extends Application {
                 }
 
                 Veterinario novoVet = new Veterinario(
-                    txtNome.getText(),
-                    txtCrmv.getText(),
-                    txtEspecialidade.getText(),
-                    valorConsulta
-                );
+                        txtNome.getText(),
+                        txtCrmv.getText(),
+                        txtEspecialidade.getText(),
+                        valorConsulta);
                 veterinarios.add(novoVet);
-                
+
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Sucesso");
                 alert.setContentText("Veterinário cadastrado com sucesso!");
                 connection.inserirVeterinario(novoVet);
                 alert.showAndWait();
-                
+
                 limparCampos(txtNome, txtCrmv, txtEspecialidade, txtValorConsulta);
             } catch (IllegalArgumentException ex) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -1662,75 +1678,72 @@ public class Main extends Application {
             VBox listLayout = new VBox(10);
             listLayout.setPadding(new Insets(20));
             listLayout.setAlignment(Pos.CENTER);
-            
+
             // Obter a lista de veterinários do banco de dados
             List<Veterinario> listaVeterinarios = connection.getTodosVeterinarios();
-            
+
             // Criar uma tabela para exibir os veterinários
             TableView<Veterinario> tabelaVeterinarios = new TableView<>();
             tabelaVeterinarios.setPrefHeight(400);
             tabelaVeterinarios.setPrefWidth(600);
-            
+
             // Definir as colunas da tabela
             TableColumn<Veterinario, String> colNome = new TableColumn<>("Nome");
             colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
             colNome.setPrefWidth(150);
-            
+
             TableColumn<Veterinario, String> colCRMV = new TableColumn<>("CRMV");
             colCRMV.setCellValueFactory(new PropertyValueFactory<>("crmv"));
             colCRMV.setPrefWidth(100);
-            
+
             TableColumn<Veterinario, String> colEspecialidade = new TableColumn<>("Especialidade");
             colEspecialidade.setCellValueFactory(new PropertyValueFactory<>("especialidade"));
             colEspecialidade.setPrefWidth(150);
-            
+
             TableColumn<Veterinario, Number> colValorConsulta = new TableColumn<>("Valor Consulta");
             colValorConsulta.setCellValueFactory(new PropertyValueFactory<>("valorConsulta"));
             colValorConsulta.setPrefWidth(120);
-            
+
             // Adicionar as colunas à tabela
             tabelaVeterinarios.getColumns().addAll(colNome, colCRMV, colEspecialidade, colValorConsulta);
-            
+
             // Adicionar os veterinários à tabela (usando a lista do banco de dados)
             tabelaVeterinarios.setItems(FXCollections.observableArrayList(listaVeterinarios));
-            
+
             Button btnAtualizar = new Button("Atualizar Lista");
             Button btnVoltar2 = new Button("Voltar");
-            
+
             btnAtualizar.setOnAction(event -> {
                 // Atualizar a lista de veterinários do banco de dados
                 List<Veterinario> veterinariosAtualizados = connection.getTodosVeterinarios();
                 tabelaVeterinarios.setItems(FXCollections.observableArrayList(veterinariosAtualizados));
             });
-            
+
             btnVoltar2.setOnAction(event -> listStage.close());
-            
+
             // Adicionar os componentes ao layout
             listLayout.getChildren().addAll(
-                new Label("Relatório de Veterinários"),
-                tabelaVeterinarios,
-                new HBox(10, btnAtualizar, btnVoltar2)
-            );
-            
+                    new Label("Relatório de Veterinários"),
+                    tabelaVeterinarios,
+                    new HBox(10, btnAtualizar, btnVoltar2));
+
             // Configurar e mostrar a cena
             Scene listScene = new Scene(listLayout, 670, 500);
             listStage.setScene(listScene);
             listStage.show();
         });
-            
 
         btnVoltar.setOnAction(e -> stage.close());
 
         layout.getChildren().addAll(
-            new Label("Cadastro de Veterinário"),
-            txtNome,
-            txtCrmv,
-            txtEspecialidade,
-            txtValorConsulta,
-            btnSalvar,
-            btnListar,
-            btnVoltar
-        );
+                new Label("Cadastro de Veterinário"),
+                txtNome,
+                txtCrmv,
+                txtEspecialidade,
+                txtValorConsulta,
+                btnSalvar,
+                btnListar,
+                btnVoltar);
 
         Scene scene = new Scene(layout, 400, 500);
         stage.setScene(scene);
