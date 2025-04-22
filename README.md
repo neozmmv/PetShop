@@ -60,7 +60,6 @@ O sistema segue um modelo orientado a objetos e conta com as seguintes classes p
 
 * BanhoETosa, ConsultaVeterinaria, Hospedagem, Adestramento: Extensões da classe Servico representando serviços específicos.
 
-* PacoteServicos: Representa um conjunto de serviços oferecidos em um pacote promocional.
 
 ## Tecnologias Utilizadas
 
